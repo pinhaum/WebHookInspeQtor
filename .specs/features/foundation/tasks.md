@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: skipped - architecture decisions are AD-001 and AD-002 in `.specs/STATE.md`
-**Status**: In Progress
+**Status**: Done
 
 ---
 

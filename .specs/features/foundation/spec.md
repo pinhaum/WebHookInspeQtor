@@ -6,8 +6,8 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 
 ## Goals
 
-- [ ] A capture route under `/h/` receives the request with its original method and an unread body.
-- [ ] `docker compose` is the only host requirement to develop and test.
+- [x] A capture route under `/h/` receives the request with its original method and an unread body.
+- [x] `docker compose` is the only host requirement to develop and test.
 
 ## Out of Scope
 
@@ -101,4 +101,4 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 
 ## Success Criteria
 
-- [ ] All FND tests green in `docker compose run --rm app mix test`.
+- [x] All FND tests green in `docker compose run --rm app mix test`.
