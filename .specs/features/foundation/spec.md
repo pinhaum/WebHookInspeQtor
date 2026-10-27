@@ -6,8 +6,8 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 
 ## Goals
 
-- [ ] A capture route under `/h/` receives the request with its original method and an unread body.
-- [ ] `docker compose` is the only host requirement to develop and test.
+- [x] A capture route under `/h/` receives the request with its original method and an unread body.
+- [x] `docker compose` is the only host requirement to develop and test.
 
 ## Out of Scope
 
@@ -83,22 +83,22 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| FND-01 | P1: Unaltered capture pipeline | - | Pending |
-| FND-02 | P1: Unaltered capture pipeline | - | Pending |
-| FND-03 | P1: Unaltered capture pipeline | - | Pending |
-| FND-04 | P1: Unaltered capture pipeline | - | Pending |
-| FND-05 | P1: Unaltered capture pipeline | - | Pending |
-| FND-06 | P1: Unaltered capture pipeline | - | Pending |
-| FND-07 | P1: Unaltered capture pipeline | - | Pending |
-| FND-08 | P1: Containerized dev environment | - | Pending |
-| FND-09 | P1: Containerized dev environment | - | Pending |
-| FND-10 | P1: Containerized dev environment | - | Pending |
-| FND-11 | P1: Containerized dev environment | - | Pending |
+| FND-01 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-02 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-03 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-04 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-05 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-06 | P1: Unaltered capture pipeline | T3 | Done |
+| FND-07 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-08 | P1: Containerized dev environment | T2 | Done |
+| FND-09 | P1: Containerized dev environment | T2 | Done |
+| FND-10 | P1: Containerized dev environment | T2 | Done |
+| FND-11 | P1: Containerized dev environment | T1, T2 | Done |
 
-**Coverage:** 11 total, 0 mapped to tasks, 11 unmapped ⚠️
+**Coverage:** 11 total, 11 mapped to tasks, 0 unmapped
 
 ---
 
 ## Success Criteria
 
-- [ ] All FND tests green in `docker compose run --rm app mix test`.
+- [x] All FND tests green in `docker compose run --rm app mix test`.

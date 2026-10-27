@@ -3,7 +3,7 @@
 ## Decisions
 
 ### AD-001
-- **Decision**: Body parsers and `Plug.MethodOverride` leave the endpoint and live in the `:browser` pipeline; the `:capture` pipeline has no parser and reads the raw body with `Plug.Conn.read_body/2`.
+- **Decision**: Body parsers leave the endpoint and live in the `:browser` pipeline; `Plug.MethodOverride` is removed, since in a pipeline it runs after route matching and would be a no-op. The `/h` capture scope has no pipeline and reads the raw body with `Plug.Conn.read_body/2`.
 - **Reason**: Byte-for-byte body fidelity and a recorded method that matches the request line; also keeps hostile multipart input from writing temp files.
 - **Trade-off**: Diverges from the generated Phoenix layout; any future non-browser route must opt into its own parsers.
 - **Scope**: endpoint, router, every capture-related feature
