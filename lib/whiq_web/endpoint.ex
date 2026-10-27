@@ -43,13 +43,13 @@ defmodule WhiqWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
-  plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
-    pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
-
-  plug Plug.MethodOverride
-  plug Plug.Head
+  # Body parsing lives in the router's :browser pipeline (AD-001), so
+  # captured requests under /h/ reach the router with an unread body.
+  plug :head_outside_capture
   plug Plug.Session, @session_options
   plug WhiqWeb.Router
+
+  # Plug.Head rewrites HEAD to GET; captures must record the real method (AD-002).
+  defp head_outside_capture(%Plug.Conn{path_info: ["h" | _]} = conn, _opts), do: conn
+  defp head_outside_capture(conn, _opts), do: Plug.Head.call(conn, [])
 end

@@ -3,6 +3,7 @@ defmodule WhiqWeb.Router do
 
   pipeline :browser do
     plug :accepts, ["html"]
+    plug Plug.Parsers, parsers: [:urlencoded], pass: ["*/*"]
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {WhiqWeb.Layouts, :root}
@@ -10,20 +11,11 @@ defmodule WhiqWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", WhiqWeb do
     pipe_through :browser
 
     get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", WhiqWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:whiq, :dev_routes) do

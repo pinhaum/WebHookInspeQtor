@@ -123,9 +123,9 @@ T3 → T4
 
 **Done when**:
 
-- [ ] HEAD `/` responds 200 with an empty body (FND-06), asserted in `test/whiq_web/controllers/page_controller_test.exs`
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: generated suite + 1, none skipped
+- [x] HEAD `/` responds 200 with an empty body (FND-06), asserted in `test/whiq_web/controllers/page_controller_test.exs`
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: generated suite + 1, none skipped
 
 **Tests**: integration
 **Gate**: full

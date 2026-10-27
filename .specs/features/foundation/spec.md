@@ -88,7 +88,7 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 | FND-03 | P1: Unaltered capture pipeline | - | Pending |
 | FND-04 | P1: Unaltered capture pipeline | - | Pending |
 | FND-05 | P1: Unaltered capture pipeline | - | Pending |
-| FND-06 | P1: Unaltered capture pipeline | - | Pending |
+| FND-06 | P1: Unaltered capture pipeline | T3 | Done |
 | FND-07 | P1: Unaltered capture pipeline | - | Pending |
 | FND-08 | P1: Containerized dev environment | T2 | Done |
 | FND-09 | P1: Containerized dev environment | T2 | Done |
