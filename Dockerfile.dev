@@ -1,0 +1,16 @@
+FROM elixir:1.19.6-otp-28
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends inotify-tools \
+ && rm -rf /var/lib/apt/lists/*
+
+# Tooling lives outside HOME so the container can run as any host UID.
+ENV MIX_HOME=/opt/mix \
+    HEX_HOME=/opt/hex
+
+RUN mix local.hex --force \
+ && mix local.rebar --force \
+ && mix archive.install hex phx_new 1.8.16 --force \
+ && chmod -R a+rwX /opt/mix /opt/hex
+
+WORKDIR /app

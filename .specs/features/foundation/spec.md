@@ -93,7 +93,7 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 | FND-08 | P1: Containerized dev environment | - | Pending |
 | FND-09 | P1: Containerized dev environment | - | Pending |
 | FND-10 | P1: Containerized dev environment | - | Pending |
-| FND-11 | P1: Containerized dev environment | - | Pending |
+| FND-11 | P1: Containerized dev environment | T1, T2 | In Progress |
 
 **Coverage:** 11 total, 0 mapped to tasks, 11 unmapped ⚠️
 
