@@ -136,7 +136,7 @@ T3 → T4
 
 ### T4: Add the capture route and stub controller
 
-**What**: A `:capture` pipeline with no plugs, `match :*` routes for `/h/:token` and `/h/:token/*path`, and `WhiqWeb.CaptureController` responding 200 with an empty body.
+**What**: A `/h` scope with no pipeline, `match :*` routes for `/h/:token` and `/h/:token/*path`, and `WhiqWeb.CaptureController` responding 200 with an empty body.
 **Where**: `lib/whiq_web/controllers/capture_controller.ex` (new), `lib/whiq_web/router.ex` (modify)
 **Depends on**: T3
 **Reuses**: Phoenix controller conventions
@@ -149,15 +149,15 @@ T3 → T4
 
 **Done when**:
 
-- [ ] `test/whiq_web/controllers/capture_controller_test.exs` has one test per AC, each asserting `conn.private.phoenix_controller == WhiqWeb.CaptureController` plus:
+- [x] `test/whiq_web/controllers/capture_controller_test.exs` has one test per AC, each asserting `conn.private.phoenix_controller == WhiqWeb.CaptureController` plus:
   - FND-01: `conn.body_params` is `%Plug.Conn.Unfetched{}` and `Plug.Conn.read_body(conn)` returns the full body sent
   - FND-02: HEAD keeps `conn.method == "HEAD"`
   - FND-03: POST with `_method=DELETE` keeps `conn.method == "POST"`
   - FND-04: `/h/:token/any/sub/path` dispatches to the controller
   - FND-05: `PROPFIND` dispatches with `conn.method == "PROPFIND"`
   - FND-07: `Accept: application/xml` gets status 200
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous suite + 6, none skipped
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous suite + 6, none skipped
 
 **Tests**: integration
 **Gate**: build

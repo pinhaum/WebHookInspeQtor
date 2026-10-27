@@ -17,6 +17,12 @@ defmodule WhiqWeb.Router do
     get "/", PageController, :home
   end
 
+  # No pipeline: captures must reach the controller exactly as sent (AD-001).
+  scope "/h", WhiqWeb do
+    match :*, "/:token", CaptureController, :capture
+    match :*, "/:token/*path", CaptureController, :capture
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:whiq, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

@@ -83,19 +83,19 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| FND-01 | P1: Unaltered capture pipeline | - | Pending |
-| FND-02 | P1: Unaltered capture pipeline | - | Pending |
-| FND-03 | P1: Unaltered capture pipeline | - | Pending |
-| FND-04 | P1: Unaltered capture pipeline | - | Pending |
-| FND-05 | P1: Unaltered capture pipeline | - | Pending |
+| FND-01 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-02 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-03 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-04 | P1: Unaltered capture pipeline | T4 | Done |
+| FND-05 | P1: Unaltered capture pipeline | T4 | Done |
 | FND-06 | P1: Unaltered capture pipeline | T3 | Done |
-| FND-07 | P1: Unaltered capture pipeline | - | Pending |
+| FND-07 | P1: Unaltered capture pipeline | T4 | Done |
 | FND-08 | P1: Containerized dev environment | T2 | Done |
 | FND-09 | P1: Containerized dev environment | T2 | Done |
 | FND-10 | P1: Containerized dev environment | T2 | Done |
 | FND-11 | P1: Containerized dev environment | T1, T2 | Done |
 
-**Coverage:** 11 total, 0 mapped to tasks, 11 unmapped ⚠️
+**Coverage:** 11 total, 11 mapped to tasks, 0 unmapped
 
 ---
 
