@@ -95,11 +95,11 @@ T3 → T4
 
 **Done when**:
 
-- [ ] `docker compose up` on a clean tree serves `http://localhost:4000` with status 200 and code reloading enabled (FND-08)
-- [ ] `docker compose run --rm app mix test` passes against the compose Postgres (FND-09)
-- [ ] `docker compose run --rm app mix precommit` passes (FND-10)
-- [ ] `find . -path ./.git -prune -o ! -user $(id -u) -print` prints nothing (FND-11)
-- [ ] Test count: generated suite passes, none skipped
+- [x] `docker compose up` on a clean tree serves `http://localhost:4000` with status 200 and code reloading enabled (FND-08)
+- [x] `docker compose run --rm app mix test` passes against the compose Postgres (FND-09)
+- [x] `docker compose run --rm app mix precommit` passes (FND-10)
+- [x] `find . -path ./.git -prune -o ! -user $(id -u) -print` prints nothing (FND-11)
+- [x] Test count: generated suite passes, none skipped
 
 **Tests**: none
 **Gate**: build

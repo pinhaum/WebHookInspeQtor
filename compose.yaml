@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    command: sh -c "mix setup && mix phx.server"
     user: "${UID:-1000}:${GID:-1000}"
     environment:
       HOME: /tmp

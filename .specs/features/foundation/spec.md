@@ -90,10 +90,10 @@ A freshly generated Phoenix 1.8 app alters requests before the router: `Plug.Par
 | FND-05 | P1: Unaltered capture pipeline | - | Pending |
 | FND-06 | P1: Unaltered capture pipeline | - | Pending |
 | FND-07 | P1: Unaltered capture pipeline | - | Pending |
-| FND-08 | P1: Containerized dev environment | - | Pending |
-| FND-09 | P1: Containerized dev environment | - | Pending |
-| FND-10 | P1: Containerized dev environment | - | Pending |
-| FND-11 | P1: Containerized dev environment | T1, T2 | In Progress |
+| FND-08 | P1: Containerized dev environment | T2 | Done |
+| FND-09 | P1: Containerized dev environment | T2 | Done |
+| FND-10 | P1: Containerized dev environment | T2 | Done |
+| FND-11 | P1: Containerized dev environment | T1, T2 | Done |
 
 **Coverage:** 11 total, 0 mapped to tasks, 11 unmapped ⚠️
 
