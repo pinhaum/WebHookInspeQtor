@@ -90,7 +90,7 @@ A visitor needs a fresh, unguessable URL to point a webhook at, and a private pa
 | BIN-04 | P1: Create a bin | T5 | Done |
 | BIN-05 | P1: Create a bin | T5 | Done |
 | BIN-06 | P1: Create a bin | T5 | Done |
-| BIN-07 | P1: Create a bin | - | Pending |
+| BIN-07 | P1: Create a bin | T6 | Done (UAT pending) |
 | BIN-08 | P1: Private view URL | T3, T4 | Done |
 | BIN-09 | P1: Private view URL | T3, T4 | Done |
 | BIN-10 | P1: Private view URL | T3, T4 | Done |

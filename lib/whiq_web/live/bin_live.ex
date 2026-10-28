@@ -27,13 +27,23 @@ defmodule WhiqWeb.BinLive do
         <div class="space-y-2">
           <label for="capture-url" class="text-sm font-semibold">Capture URL</label>
           <p class="text-sm opacity-70">Send any HTTP request here.</p>
-          <input
-            id="capture-url"
-            type="text"
-            value={@capture_url}
-            readonly
-            class="w-full input font-mono text-sm"
-          />
+          <div class="join w-full">
+            <input
+              id="capture-url"
+              type="text"
+              value={@capture_url}
+              readonly
+              class="join-item input w-full font-mono text-sm"
+            />
+            <button
+              id="copy-capture-url"
+              type="button"
+              phx-click={JS.dispatch("whiq:copy", to: "#capture-url")}
+              class="join-item btn btn-primary"
+            >
+              <.icon name="hero-clipboard-document" class="size-4" /> Copy
+            </button>
+          </div>
         </div>
 
         <p class="text-sm">

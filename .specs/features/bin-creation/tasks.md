@@ -231,13 +231,17 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq_web/live/bin_live_test.exs`: the `#copy-capture-url` element's `phx-click` decodes to a `dispatch` of `whiq:copy` targeting `#capture-url`
-- [ ] Manual UAT item recorded for the Verifier: in a browser on `http://localhost:4000`, Copy puts the capture URL on the clipboard
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 28 + 1 tests pass
+- [x] `test/whiq_web/live/bin_live_test.exs`: the `#copy-capture-url` element's `phx-click` decodes to a `dispatch` of `whiq:copy` targeting `#capture-url`
+- [x] Manual UAT item recorded for the Verifier: in a browser on `http://localhost:4000`, Copy puts the capture URL on the clipboard
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 28 + 1 tests pass
 
 **Tests**: integration
 **Gate**: build
+
+**Manual UAT (pending, for the Verifier)**: open a bin on `http://localhost:4000`, click Copy, paste: the clipboard holds the capture URL.
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(bins): copy capture url to clipboard`
 

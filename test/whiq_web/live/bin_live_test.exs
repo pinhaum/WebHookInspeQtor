@@ -70,5 +70,14 @@ defmodule WhiqWeb.BinLiveTest do
       refute dead_html =~ bin.view_token
       refute render(view) =~ bin.view_token
     end
+
+    test "BIN-07: Copy dispatches whiq:copy to the capture url input", %{document: document} do
+      [phx_click] =
+        document |> LazyHTML.query("#copy-capture-url") |> LazyHTML.attribute("phx-click")
+
+      assert Jason.decode!(phx_click) == [
+               ["dispatch", %{"event" => "whiq:copy", "to" => "#capture-url"}]
+             ]
+    end
   end
 end
