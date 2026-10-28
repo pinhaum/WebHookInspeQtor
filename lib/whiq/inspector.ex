@@ -32,11 +32,23 @@ defmodule Whiq.Inspector do
   format is rejected before any query runs.
   """
   def fetch_live_bin_by_view_token(token) when is_binary(token) do
+    fetch_live_bin(:view_token, token)
+  end
+
+  @doc """
+  Fetches an unexpired bin by its capture token. A token outside the token
+  format is rejected before any query runs.
+  """
+  def fetch_live_bin_by_capture_token(token) when is_binary(token) do
+    fetch_live_bin(:capture_token, token)
+  end
+
+  defp fetch_live_bin(field, token) do
     if token =~ @token_format do
       now = DateTime.utc_now(:second)
 
       Bin
-      |> where([b], b.view_token == ^token and b.expires_at > ^now)
+      |> where([b], field(b, ^field) == ^token and b.expires_at > ^now)
       |> Repo.one()
       |> case do
         nil -> {:error, :not_found}

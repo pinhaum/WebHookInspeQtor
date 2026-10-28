@@ -106,18 +106,20 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `test/whiq/inspector_test.exs`, `describe "fetch_live_bin_by_capture_token/1"`:
+- [x] `test/whiq/inspector_test.exs`, `describe "fetch_live_bin_by_capture_token/1"`:
   - capture token of a live bin → `{:ok, %Bin{id: ^id}}`
   - CAP-16: well-formed unknown token → `{:error, :not_found}`
   - CAP-16: malformed token → `{:error, :not_found}` with zero `[:whiq, :repo, :query]` events
   - CAP-17: bin with `expires_at` moved to the past → `{:error, :not_found}`
   - CAP-18: the bin's `view_token` → `{:error, :not_found}`
-- [ ] Existing `fetch_live_bin_by_view_token/1` tests still pass unchanged
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq`
-- [ ] Test count: 31 + 5 tests pass
+- [x] Existing `fetch_live_bin_by_view_token/1` tests still pass unchanged
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq`
+- [x] Test count: 31 + 5 tests pass
 
 **Tests**: integration
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(inspector): look up live bins by capture token`
 

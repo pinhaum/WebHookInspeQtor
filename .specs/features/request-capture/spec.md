@@ -111,9 +111,9 @@ The core promise of the inspector is fidelity: what the bin shows must be what t
 | CAP-13 | P1: Capture any request faithfully | T4,T7 | Pending |
 | CAP-14 | P1: Capture any request faithfully | T4 | Pending |
 | CAP-15 | P1: Capture any request faithfully | T3 | Pending |
-| CAP-16 | P1: Reject captures for missing bins | T2,T5 | Pending |
-| CAP-17 | P1: Reject captures for missing bins | T2,T5 | Pending |
-| CAP-18 | P1: Reject captures for missing bins | T2,T5 | Pending |
+| CAP-16 | P1: Reject captures for missing bins | T2,T5 | In Progress |
+| CAP-17 | P1: Reject captures for missing bins | T2,T5 | In Progress |
+| CAP-18 | P1: Reject captures for missing bins | T2,T5 | In Progress |
 | CAP-19 | P1: Reject captures for missing bins | T6 | Pending |
 | CAP-20 | P1: Capture any request faithfully | T4 | Pending |
 | CAP-21 | P1: Capture any request faithfully | T3,T4 | Pending |
