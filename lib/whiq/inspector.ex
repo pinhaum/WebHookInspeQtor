@@ -7,6 +7,7 @@ defmodule Whiq.Inspector do
   import Ecto.Query
 
   alias Whiq.Inspector.Bin
+  alias Whiq.Inspector.CapturedRequest
   alias Whiq.Repo
 
   @ttl_days 7
@@ -41,6 +42,33 @@ defmodule Whiq.Inspector do
   """
   def fetch_live_bin_by_capture_token(token) when is_binary(token) do
     fetch_live_bin(:capture_token, token)
+  end
+
+  @doc """
+  Stores a request captured by `bin`. The snapshot is a plain map built by
+  the web layer (AD-004); headers are `[{name, value}]` in received order
+  and are stored flattened (AD-008). `body_size` and `content_type` are
+  derived here so they always agree with the stored bytes.
+  """
+  def capture_request(%Bin{} = bin, %{
+        method: method,
+        path: path,
+        query_string: query_string,
+        headers: headers,
+        body: body,
+        remote_ip: remote_ip
+      }) do
+    Repo.insert(%CapturedRequest{
+      bin_id: bin.id,
+      method: method,
+      path: path,
+      query_string: query_string,
+      headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
+      body: body,
+      body_size: byte_size(body),
+      content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
+      remote_ip: remote_ip
+    })
   end
 
   defp fetch_live_bin(field, token) do

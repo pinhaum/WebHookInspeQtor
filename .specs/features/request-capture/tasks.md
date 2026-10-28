@@ -140,7 +140,7 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `test/whiq/inspector_test.exs`, `describe "capture_request/2"`, each asserting against `Repo.get!(CapturedRequest, id)`:
+- [x] `test/whiq/inspector_test.exs`, `describe "capture_request/2"`, each asserting against `Repo.get!(CapturedRequest, id)`:
   - every snapshot field is stored as given and `bin_id` is the bin's id
   - CAP-06: headers `[{"x-a", "1"}, {"x-b", "2"}, {"x-a", "3"}]` are stored as `["x-a", "1", "x-b", "2", "x-a", "3"]`
   - CAP-06 / AD-008: a header value containing `<<0xFF, 0x80>>` round-trips
@@ -149,11 +149,13 @@ T6 → T7
   - CAP-12: `content_type` equals the `content-type` header value; nil when the header is absent
   - CAP-15: passing a `%Plug.Conn{}` raises `FunctionClauseError` and stores nothing
   - CAP-21: empty body → `body == ""` and `body_size == 0`
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 36 + 8 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 36 + 8 tests pass
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(inspector): store captured requests byte-for-byte`
 
