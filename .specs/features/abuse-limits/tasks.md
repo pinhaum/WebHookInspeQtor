@@ -105,11 +105,11 @@ T9 → T10
 
 **Done when**:
 
-- [ ] 524,289-byte body → stored 524,288 bytes equal to the first 524,288 sent, `body_truncated` true, `body_size` 524,288
-- [ ] 524,288-byte body → stored whole, `body_truncated` false
-- [ ] `:max_body_bytes` added to `config/config.exs`
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq/inspector_test.exs`
-- [ ] Test count: previous + new tests pass
+- [x] 524,289-byte body → stored 524,288 bytes equal to the first 524,288 sent, `body_truncated` true, `body_size` 524,288
+- [x] 524,288-byte body → stored whole, `body_truncated` false
+- [x] `:max_body_bytes` added to `config/config.exs`
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq/inspector_test.exs`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: quick

@@ -50,6 +50,9 @@ defmodule Whiq.Inspector do
   and are stored flattened (AD-008). `body_size` and `content_type` are
   derived here so they always agree with the stored bytes.
 
+  A body longer than the `:max_body_bytes` config is stored cut to that
+  many bytes with `body_truncated` set (AD-007).
+
   Once stored, the request is broadcast as `{:request_captured, request}`
   to the bin's subscribers (see `subscribe/1`).
   """
@@ -61,6 +64,9 @@ defmodule Whiq.Inspector do
         body: body,
         remote_ip: remote_ip
       }) do
+    max_body_bytes = Application.fetch_env!(:whiq, :max_body_bytes)
+    stored_body = binary_part(body, 0, min(byte_size(body), max_body_bytes))
+
     with {:ok, request} <-
            Repo.insert(%CapturedRequest{
              bin_id: bin.id,
@@ -68,8 +74,9 @@ defmodule Whiq.Inspector do
              path: path,
              query_string: query_string,
              headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
-             body: body,
-             body_size: byte_size(body),
+             body: stored_body,
+             body_size: byte_size(stored_body),
+             body_truncated: byte_size(body) > max_body_bytes,
              content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
              remote_ip: remote_ip
            }) do

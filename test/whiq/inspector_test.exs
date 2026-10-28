@@ -237,6 +237,28 @@ defmodule Whiq.InspectorTest do
       assert Repo.aggregate(CapturedRequest, :count) == 0
     end
 
+    test "LIM-01: a body over 524,288 bytes is stored cut to its first 524,288 bytes" do
+      {:ok, bin} = Inspector.create_bin()
+      body = :crypto.strong_rand_bytes(524_289)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == binary_part(body, 0, 524_288)
+      assert stored.body_truncated == true
+      assert stored.body_size == 524_288
+    end
+
+    test "LIM-02: a body of exactly 524,288 bytes is stored whole and not truncated" do
+      {:ok, bin} = Inspector.create_bin()
+      body = :crypto.strong_rand_bytes(524_288)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == body
+      assert stored.body_truncated == false
+      assert stored.body_size == 524_288
+    end
+
     test "CAP-21: an empty body is stored as an empty binary with body_size 0" do
       {:ok, bin} = Inspector.create_bin()
 
