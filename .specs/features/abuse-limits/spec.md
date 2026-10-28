@@ -50,6 +50,7 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 
 1. IF a request body exceeds 524,288 bytes THEN the system SHALL store its first 524,288 bytes, set `body_truncated` to true and respond 200 (LIM-01)
 2. WHEN a request body is exactly 524,288 bytes THEN the system SHALL store it whole with `body_truncated` false (LIM-02)
+3. WHERE `body_truncated` is true, the bin page SHALL display "Body truncated: showing the first <body_size> bytes" (LIVE-10)
 
 **Independent Test**: Capture a 524,289-byte body and assert stored size and flag.
 
@@ -66,6 +67,7 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 1. WHEN a capture arrives for a bin holding 100 requests THEN the system SHALL store it and delete the bin's oldest request (LIM-03)
 2. WHEN 20 captures arrive concurrently for a bin holding 95 requests THEN the system SHALL leave exactly 100 requests, the 100 newest (LIM-04)
 3. WHEN a request is evicted THEN the system SHALL broadcast the eviction on the bin's topic (LIM-05)
+4. WHEN the ring buffer evicts a request THEN every open page of that bin SHALL remove it from the list (LIVE-04)
 
 **Independent Test**: Fill a bin to the cap, capture one more, assert count and which id was removed.
 
@@ -106,6 +108,7 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 
 - WHEN a truncated capture also triggers eviction THEN the system SHALL apply both in the same transaction (LIM-11)
 - IF a capture is rejected by the rate limit THEN the system SHALL NOT evict any request (LIM-12)
+- IF the selected request is evicted by the ring buffer THEN the bin page SHALL select the newest remaining request (LIVE-14)
 
 ---
 
@@ -125,8 +128,11 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 | LIM-10 | P1: Bin creation rate limit | - | Pending |
 | LIM-11 | P1: Ring buffer per bin | - | Pending |
 | LIM-12 | P1: Capture rate limit | - | Pending |
+| LIVE-04 | P1: Ring buffer per bin (moved from live-inspection) | - | Pending |
+| LIVE-10 | P1: Bounded body size (moved from live-inspection) | - | Pending |
+| LIVE-14 | P1: Ring buffer per bin (moved from live-inspection) | - | Pending |
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
+**Coverage:** 15 total, 0 mapped to tasks, 15 unmapped ⚠️
 
 ---
 
