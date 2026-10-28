@@ -106,14 +106,16 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq/inspector_test.exs` asserts, against the persisted row (`Repo.get!`):
+- [x] `test/whiq/inspector_test.exs` asserts, against the persisted row (`Repo.get!`):
   - BIN-02: both tokens match `~r/\A[A-Za-z0-9_-]{32}\z/` and differ from each other; two bins never share a token
   - BIN-03: `DateTime.diff(expires_at, inserted_at) == 7 * 86_400`
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq`
-- [ ] Test count: 12 + 2 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq`
+- [x] Test count: 12 + 2 tests pass
 
 **Tests**: integration
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(inspector): create bins with capture and view tokens`
 

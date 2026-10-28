@@ -85,8 +85,8 @@ A visitor needs a fresh, unguessable URL to point a webhook at, and a private pa
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | BIN-01 | P1: Create a bin | - | Pending |
-| BIN-02 | P1: Create a bin | T1, T2 | In progress |
-| BIN-03 | P1: Create a bin | T1, T2 | In progress |
+| BIN-02 | P1: Create a bin | T1, T2 | Done |
+| BIN-03 | P1: Create a bin | T1, T2 | Done |
 | BIN-04 | P1: Create a bin | - | Pending |
 | BIN-05 | P1: Create a bin | - | Pending |
 | BIN-06 | P1: Create a bin | - | Pending |
