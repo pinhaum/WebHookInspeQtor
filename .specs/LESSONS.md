@@ -44,6 +44,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: CAP-02, CAP-03, CAP-12 (validation.md spec-precision gaps) (spec)
 - last seen: 2026-10-28T17:39:31Z
 
+### L-006 - When a limit is keyed on the client IP, test it with the proxy header configured and a shared peer address, so keying on the raw peer address fails
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `routes` · harmful: 0
+- features: abuse-limits
+- evidence: validation.md M13 / lib/whiq_web/controllers/bin_controller.ex:11 (LIM-10) (routes)
+- last seen: 2026-10-28T20:44:50Z
+
+### L-007 - Give every error branch a controller maps from the domain an HTTP-level test, not only a domain-level one
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `routes` · harmful: 0
+- features: abuse-limits
+- evidence: validation.md M18 / lib/whiq_web/controllers/capture_controller.ex:17 (routes)
+- last seen: 2026-10-28T20:44:50Z
+
+### L-008 - When a cap shrinks a read below the adapter's chunk size, keep a test with an adapter that returns short chunks so the accumulation loop stays exercised
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `routes` · harmful: 0
+- features: abuse-limits
+- evidence: validation.md M16, M17 / lib/whiq_web/capture_snapshot.ex:44-45 (routes)
+- last seen: 2026-10-28T20:44:50Z
+
+### L-009 - Define client IP in the spec wherever an AC keys on it, including the proxy header rule
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: abuse-limits
+- evidence: validation.md SP-1 (LIM-09, LIM-10) (spec)
+- last seen: 2026-10-28T20:44:50Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
