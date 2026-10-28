@@ -56,10 +56,11 @@ defmodule WhiqWeb.CaptureSnapshotTest do
     assert snapshot(conn).headers == [{"x-a", "1"}, {"x-b", "2"}, {"x-a", "3"}]
   end
 
-  test "CAP-07: a body larger than one read_body chunk is returned complete" do
+  test "LIM-01: a body over the cap is returned as its first max_body_bytes + 1 bytes" do
     body = :binary.copy("x", 8_000_001)
+    limit = Application.fetch_env!(:whiq, :max_body_bytes) + 1
 
-    assert snapshot(conn(:post, "/h/#{@token}", body)).body == body
+    assert snapshot(conn(:post, "/h/#{@token}", body)).body == binary_part(body, 0, limit)
   end
 
   test "CAP-13: a configured header with a valid IP is the remote_ip" do

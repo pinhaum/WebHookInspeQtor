@@ -220,10 +220,10 @@ T9 → T10
 
 **Done when**:
 
-- [ ] ConnTest: 524,289-byte POST → 200, row truncated; 524,288-byte POST → 200, row whole
-- [ ] Real server: a 1 MB `content-length` body → status line `200`, row stored with 524,288 bytes and `body_truncated` true
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] ConnTest: 524,289-byte POST → 200, row truncated; 524,288-byte POST → 200, row whole
+- [x] Real server: a 1 MB `content-length` body → status line `200`, row stored with 524,288 bytes and `body_truncated` true
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full

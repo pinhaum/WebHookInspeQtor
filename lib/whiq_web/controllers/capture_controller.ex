@@ -9,8 +9,11 @@ defmodule WhiqWeb.CaptureController do
     case Inspector.fetch_live_bin_by_capture_token(token) do
       {:ok, bin} ->
         {snapshot, conn} = CaptureSnapshot.from_conn(conn)
-        {:ok, _request} = Inspector.capture_request(bin, snapshot)
-        send_resp(conn, 200, "")
+
+        case Inspector.capture_request(bin, snapshot) do
+          {:ok, _request} -> send_resp(conn, 200, "")
+          {:error, :not_found} -> send_resp(conn, 404, "")
+        end
 
       {:error, :not_found} ->
         send_resp(conn, 404, "")

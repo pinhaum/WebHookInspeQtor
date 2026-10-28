@@ -155,6 +155,39 @@ defmodule WhiqWeb.CaptureControllerTest do
     assert stored.content_type == "text/plain; charset=utf-8"
   end
 
+  describe "body size cap" do
+    test "LIM-01: a 524,289-byte body is answered 200 and stored truncated to 524,288 bytes",
+         %{conn: conn, bin: bin} do
+      body = :crypto.strong_rand_bytes(524_289)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/octet-stream")
+        |> post("/h/#{bin.capture_token}", body)
+
+      assert response(conn, 200) == ""
+      stored = stored_request(bin)
+      assert stored.body == binary_part(body, 0, 524_288)
+      assert stored.body_size == 524_288
+      assert stored.body_truncated == true
+    end
+
+    test "LIM-02: a 524,288-byte body is answered 200 and stored whole",
+         %{conn: conn, bin: bin} do
+      body = :crypto.strong_rand_bytes(524_288)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/octet-stream")
+        |> post("/h/#{bin.capture_token}", body)
+
+      assert response(conn, 200) == ""
+      stored = stored_request(bin)
+      assert stored.body == body
+      assert stored.body_truncated == false
+    end
+  end
+
   describe "requests that store nothing" do
     test "CAP-16: an unknown capture token is answered 404", %{conn: conn} do
       conn =
