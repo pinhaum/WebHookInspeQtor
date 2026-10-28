@@ -78,12 +78,14 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `docker compose run --rm app mix ecto.migrate` and `mix ecto.rollback` both succeed
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 31 tests pass (baseline, none skipped)
+- [x] `docker compose run --rm app mix ecto.migrate` and `mix ecto.rollback` both succeed
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 31 tests pass (baseline, none skipped)
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(inspector): add requests table and schema`
 
