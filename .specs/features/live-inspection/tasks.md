@@ -238,12 +238,12 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] Clicking an older row shows its detail and marks it selected
-- [ ] A live arrival while a request is selected keeps that selection
-- [ ] A live arrival into an empty bin becomes the selection
-- [ ] A forged `select` with another bin's id or a non-integer leaves the detail unchanged
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] Clicking an older row shows its detail and marks it selected
+- [x] A live arrival while a request is selected keeps that selection
+- [x] A live arrival into an empty bin becomes the selection
+- [x] A forged `select` with another bin's id or a non-integer leaves the detail unchanged
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: build

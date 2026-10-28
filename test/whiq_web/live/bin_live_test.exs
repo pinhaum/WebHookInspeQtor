@@ -333,4 +333,81 @@ defmodule WhiqWeb.BinLiveTest do
       assert render(view) |> String.valid?()
     end
   end
+
+  describe "selection" do
+    defp selected_rows(view) do
+      view
+      |> render()
+      |> LazyHTML.from_fragment()
+      |> LazyHTML.query("#requests button[aria-current='true']")
+      |> LazyHTML.attribute("id")
+    end
+
+    defp detail_path(view) do
+      view |> render() |> LazyHTML.from_fragment() |> text("#detail-path")
+    end
+
+    test "LIVE-06: each row is a select control carrying its request id",
+         %{conn: conn, bin: bin} do
+      request = capture!(bin)
+
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+
+      assert has_element?(
+               view,
+               "button#requests-#{request.id}-select[type='button'][phx-click='select'][phx-value-id='#{request.id}']"
+             )
+    end
+
+    test "LIVE-06: clicking an older row shows its detail and marks it selected",
+         %{conn: conn, bin: bin} do
+      older = capture!(bin, %{path: "/older"})
+      newer = capture!(bin, %{path: "/newer"})
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      assert selected_rows(view) == ["requests-#{newer.id}-select"]
+
+      view |> element("#requests-#{older.id}-select") |> render_click()
+
+      assert detail_path(view) == "/older"
+      assert selected_rows(view) == ["requests-#{older.id}-select"]
+    end
+
+    test "LIVE-13: a live arrival keeps the current selection", %{conn: conn, bin: bin} do
+      older = capture!(bin, %{path: "/older"})
+      capture!(bin, %{path: "/newer"})
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      view |> element("#requests-#{older.id}-select") |> render_click()
+
+      capture!(bin, %{path: "/latest"})
+
+      assert detail_path(view) == "/older"
+      assert selected_rows(view) == ["requests-#{older.id}-select"]
+    end
+
+    test "LIVE-13: a live arrival into an empty bin becomes the selection",
+         %{conn: conn, bin: bin} do
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      refute has_element?(view, "#request-detail")
+
+      request = capture!(bin, %{path: "/first"})
+
+      assert detail_path(view) == "/first"
+      assert selected_rows(view) == ["requests-#{request.id}-select"]
+    end
+
+    test "a forged select with a foreign or malformed id leaves the page unchanged",
+         %{conn: conn, bin: bin} do
+      {:ok, other} = Inspector.create_bin()
+      foreign = capture!(other, %{path: "/foreign"})
+      older = capture!(bin, %{path: "/older"})
+      capture!(bin, %{path: "/newer"})
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      before = render(view)
+
+      for id <- ["#{foreign.id}", "abc", "#{older.id}x", "", older.id] do
+        render_hook(view, "select", %{"id" => id})
+        assert render(view) == before
+      end
+    end
+  end
 end

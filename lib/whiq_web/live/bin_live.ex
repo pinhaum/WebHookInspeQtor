@@ -4,7 +4,8 @@ defmodule WhiqWeb.BinLive do
   alias Whiq.Inspector
   alias WhiqWeb.ByteFormat
 
-  # Only derived values are assigned: the view token must never reach the page (BIN-11).
+  # The bin is kept for later reads, but the template must never render its
+  # view token (BIN-11).
   @impl true
   def mount(%{"token" => token}, _session, socket) do
     case Inspector.fetch_live_bin_by_view_token(token) do
@@ -17,6 +18,7 @@ defmodule WhiqWeb.BinLive do
         {:ok,
          socket
          |> assign(
+           bin: bin,
            capture_url: url(~p"/h/#{bin.capture_token}"),
            expires_at: DateTime.to_iso8601(bin.expires_at),
            request_count: length(requests),
@@ -38,13 +40,42 @@ defmodule WhiqWeb.BinLive do
     end
   end
 
+  # A live arrival becomes the selection only when nothing is selected (LIVE-13).
   @impl true
   def handle_info({:request_captured, request}, socket) do
+    socket =
+      if socket.assigns.selected, do: socket, else: assign(socket, :selected, request)
+
     {:noreply,
      socket
      |> update(:request_count, &(&1 + 1))
      |> stream_insert(:requests, request, at: 0)}
   end
+
+  # The id comes from the client: anything that is not one of this bin's
+  # request ids leaves the page unchanged.
+  @impl true
+  def handle_event("select", %{"id" => id}, socket) when is_binary(id) do
+    with {id, ""} <- Integer.parse(id),
+         {:ok, request} <- Inspector.fetch_request(socket.assigns.bin, id) do
+      {:noreply, select(socket, request)}
+    else
+      _ -> {:noreply, socket}
+    end
+  end
+
+  def handle_event("select", _params, socket), do: {:noreply, socket}
+
+  # Rows only re-render when re-inserted, so both the old and the new
+  # selection go back into the stream to move the highlight.
+  defp select(socket, request) do
+    previous = socket.assigns.selected
+    socket = assign(socket, :selected, request)
+    socket = if previous, do: stream_insert(socket, :requests, previous), else: socket
+    stream_insert(socket, :requests, request)
+  end
+
+  defp selected?(selected, request), do: selected != nil and selected.id == request.id
 
   @impl true
   def render(assigns) do
@@ -97,17 +128,25 @@ defmodule WhiqWeb.BinLive do
             </div>
 
             <ul id="requests" phx-update="stream" class="divide-y divide-base-300">
-              <li
-                :for={{dom_id, request} <- @streams.requests}
-                id={dom_id}
-                class="flex items-center gap-3 py-2 font-mono text-sm"
-              >
-                <span id={"#{dom_id}-method"} class="badge badge-neutral">{request.method}</span>
-                <span id={"#{dom_id}-path"} class="flex-1 truncate">{request.path}</span>
-                <time id={"#{dom_id}-time"} class="opacity-70">
-                  {DateTime.to_iso8601(request.inserted_at)}
-                </time>
-                <span id={"#{dom_id}-size"} class="opacity-70">{request.body_size} bytes</span>
+              <li :for={{dom_id, request} <- @streams.requests} id={dom_id}>
+                <button
+                  id={"#{dom_id}-select"}
+                  type="button"
+                  phx-click="select"
+                  phx-value-id={request.id}
+                  aria-current={selected?(@selected, request) && "true"}
+                  class={[
+                    "flex w-full items-center gap-3 rounded-field px-2 py-2 text-left font-mono text-sm transition-colors hover:bg-base-200",
+                    selected?(@selected, request) && "bg-base-200 ring-1 ring-primary"
+                  ]}
+                >
+                  <span id={"#{dom_id}-method"} class="badge badge-neutral">{request.method}</span>
+                  <span id={"#{dom_id}-path"} class="flex-1 truncate">{request.path}</span>
+                  <time id={"#{dom_id}-time"} class="opacity-70">
+                    {DateTime.to_iso8601(request.inserted_at)}
+                  </time>
+                  <span id={"#{dom_id}-size"} class="opacity-70">{request.body_size} bytes</span>
+                </button>
               </li>
             </ul>
           </div>

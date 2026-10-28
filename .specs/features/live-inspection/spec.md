@@ -89,13 +89,13 @@ Debugging a webhook means triggering an event and watching what arrives. The bin
 | LIVE-02 | P1: See requests arrive in real time | T3,T5 | Done |
 | LIVE-03 | P1: See requests arrive in real time | T3,T5 | Done |
 | LIVE-05 | P1: See requests arrive in real time | T4 | Done |
-| LIVE-06 | P1: Inspect one request in detail | T2,T6,T7 | In Progress |
+| LIVE-06 | P1: Inspect one request in detail | T2,T6,T7 | Done |
 | LIVE-07 | P1: Inspect one request in detail | T1,T6 | Done |
 | LIVE-08 | P1: Inspect one request in detail | T1,T6 | Done |
 | LIVE-09 | P1: Inspect one request in detail | T1,T6 | Done |
 | LIVE-11 | P1: Inspect one request in detail | T6 | Done |
 | LIVE-12 | P1: Inspect one request in detail | T6 | Done |
-| LIVE-13 | P1: Inspect one request in detail | T7 | Pending |
+| LIVE-13 | P1: Inspect one request in detail | T7 | Done |
 | LIVE-15 | P1: Inspect one request in detail | T1,T6 | Done |
 
 **Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
