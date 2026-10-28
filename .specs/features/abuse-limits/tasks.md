@@ -133,14 +133,14 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Bin with 100 requests + 1 capture → 100 rows, the oldest id gone, the new id present
-- [ ] Bin with 99 requests + 1 capture → 100 rows, nothing evicted, no `:request_evicted` message
-- [ ] Subscriber receives `{:request_evicted, oldest_id}` after `{:request_captured, _}`
-- [ ] Truncated capture into a full bin → stored truncated and oldest evicted (LIM-11)
-- [ ] `test/whiq/inspector_concurrency_test.exs` (`async: false`, sandbox `:auto`, bin deleted in `on_exit`): 95 requests + 20 parallel captures → exactly 100 rows, the 100 newest ids; confirm the tasks use distinct connections (e.g. distinct `pg_backend_pid()`)
-- [ ] `:max_requests_per_bin` added to `config/config.exs`
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq`
-- [ ] Test count: previous + new tests pass
+- [x] Bin with 100 requests + 1 capture → 100 rows, the oldest id gone, the new id present
+- [x] Bin with 99 requests + 1 capture → 100 rows, nothing evicted, no `:request_evicted` message
+- [x] Subscriber receives `{:request_evicted, oldest_id}` after `{:request_captured, _}`
+- [x] Truncated capture into a full bin → stored truncated and oldest evicted (LIM-11)
+- [x] `test/whiq/inspector_concurrency_test.exs` (`async: false`, sandbox `:auto`, bin deleted in `on_exit`): 95 requests + 20 parallel captures → exactly 100 rows, the 100 newest ids; confirm the tasks use distinct connections (e.g. distinct `pg_backend_pid()`)
+- [x] `:max_requests_per_bin` added to `config/config.exs`
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: quick

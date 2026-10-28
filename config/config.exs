@@ -11,8 +11,9 @@ config :whiq,
   ecto_repos: [Whiq.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-# Abuse limits (AD-007). Captured bodies are stored up to this many bytes.
+# Abuse limits (AD-007): bytes stored per body, requests kept per bin.
 config :whiq, :max_body_bytes, 524_288
+config :whiq, :max_requests_per_bin, 100
 
 # Configure the endpoint
 config :whiq, WhiqWeb.Endpoint,

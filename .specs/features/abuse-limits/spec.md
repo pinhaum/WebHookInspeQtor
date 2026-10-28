@@ -118,15 +118,15 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 | -------------- | ----- | ----- | ------ |
 | LIM-01 | P1: Bounded body size | T1,T2,T6 | In Progress |
 | LIM-02 | P1: Bounded body size | T2,T6 | In Progress |
-| LIM-03 | P1: Ring buffer per bin | - | Pending |
-| LIM-04 | P1: Ring buffer per bin | - | Pending |
-| LIM-05 | P1: Ring buffer per bin | - | Pending |
+| LIM-03 | P1: Ring buffer per bin | T3 | Done |
+| LIM-04 | P1: Ring buffer per bin | T3 | Done |
+| LIM-05 | P1: Ring buffer per bin | T3 | Done |
 | LIM-06 | P1: Capture rate limit | - | Pending |
 | LIM-07 | P1: Capture rate limit | - | Pending |
 | LIM-08 | P1: Capture rate limit | - | Pending |
 | LIM-09 | P1: Bin creation rate limit | - | Pending |
 | LIM-10 | P1: Bin creation rate limit | - | Pending |
-| LIM-11 | P1: Ring buffer per bin | - | Pending |
+| LIM-11 | P1: Ring buffer per bin | T2,T3 | Done |
 | LIM-12 | P1: Capture rate limit | - | Pending |
 | LIVE-04 | P1: Ring buffer per bin (moved from live-inspection) | - | Pending |
 | LIVE-10 | P1: Bounded body size (moved from live-inspection) | - | Pending |
