@@ -15,6 +15,7 @@ defmodule WhiqWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    post "/bins", BinController, :create
     live "/bins/:token", BinLive
   end
 

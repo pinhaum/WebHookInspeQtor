@@ -262,13 +262,15 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq_web/controllers/bin_controller_test.exs`: BIN-01 `post ~p"/bins"` persists exactly one bin and `redirected_to(conn) == ~p"/bins/#{bin.view_token}"`; following the redirect mounts `#bin-page`
-- [ ] `test/whiq_web/controllers/page_controller_test.exs`: the boilerplate text assertion is replaced by `#create-bin-form` with action `/bins` and method post (asserted via `LazyHTML`)
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: 29 + 1 tests pass (the page test is replaced, not added)
+- [x] `test/whiq_web/controllers/bin_controller_test.exs`: BIN-01 `post ~p"/bins"` persists exactly one bin and `redirected_to(conn) == ~p"/bins/#{bin.view_token}"`; following the redirect mounts `#bin-page`
+- [x] `test/whiq_web/controllers/page_controller_test.exs`: the boilerplate text assertion is replaced by `#create-bin-form` with action `/bins` and method post (asserted via `LazyHTML`)
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: 29 + 1 tests pass (the page test is replaced, not added)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(bins): create a bin from the home page`
 
