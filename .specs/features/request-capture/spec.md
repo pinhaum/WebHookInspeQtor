@@ -96,24 +96,24 @@ The core promise of the inspector is fidelity: what the bin shows must be what t
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| CAP-01 | P1: Capture any request faithfully | T1,T5 | Pending |
-| CAP-02 | P1: Capture any request faithfully | T4,T5 | In Progress |
-| CAP-03 | P1: Capture any request faithfully | T4,T5 | In Progress |
-| CAP-04 | P1: Capture any request faithfully | T4,T5 | In Progress |
-| CAP-05 | P1: Capture any request faithfully | T4,T5 | In Progress |
-| CAP-06 | P1: Capture any request faithfully | T3,T4,T5 | In Progress |
-| CAP-07 | P1: Capture any request faithfully | T3,T4,T5 | In Progress |
+| CAP-01 | P1: Capture any request faithfully | T1,T5 | Done |
+| CAP-02 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-03 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-04 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-05 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-06 | P1: Capture any request faithfully | T3,T4,T5 | Done |
+| CAP-07 | P1: Capture any request faithfully | T3,T4,T5 | Done |
 | CAP-08 | P1: Capture any request faithfully | T6 | Pending |
-| CAP-09 | P1: Capture any request faithfully | T5 | Pending |
-| CAP-10 | P1: Capture any request faithfully | T5 | Pending |
-| CAP-11 | P1: Capture any request faithfully | T3,T5 | In Progress |
-| CAP-12 | P1: Capture any request faithfully | T3,T5 | In Progress |
+| CAP-09 | P1: Capture any request faithfully | T5 | Done |
+| CAP-10 | P1: Capture any request faithfully | T5 | Done |
+| CAP-11 | P1: Capture any request faithfully | T3,T5 | Done |
+| CAP-12 | P1: Capture any request faithfully | T3,T5 | Done |
 | CAP-13 | P1: Capture any request faithfully | T4,T7 | In Progress |
 | CAP-14 | P1: Capture any request faithfully | T4 | Done |
 | CAP-15 | P1: Capture any request faithfully | T3 | Done |
-| CAP-16 | P1: Reject captures for missing bins | T2,T5 | In Progress |
-| CAP-17 | P1: Reject captures for missing bins | T2,T5 | In Progress |
-| CAP-18 | P1: Reject captures for missing bins | T2,T5 | In Progress |
+| CAP-16 | P1: Reject captures for missing bins | T2,T5 | Done |
+| CAP-17 | P1: Reject captures for missing bins | T2,T5 | Done |
+| CAP-18 | P1: Reject captures for missing bins | T2,T5 | Done |
 | CAP-19 | P1: Reject captures for missing bins | T6 | Pending |
 | CAP-20 | P1: Capture any request faithfully | T4 | Done |
 | CAP-21 | P1: Capture any request faithfully | T3,T4 | Done |

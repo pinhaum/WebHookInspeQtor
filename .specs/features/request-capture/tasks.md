@@ -215,7 +215,7 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `test/whiq_web/controllers/capture_controller_test.exs` rewritten on real bins. The 6 `tok123` routing tests would now 404; each is replaced by the AC test that covers the same behavior, none is dropped. Each test asserts the single stored row:
+- [x] `test/whiq_web/controllers/capture_controller_test.exs` rewritten on real bins. The 6 `tok123` routing tests would now 404; each is replaced by the AC test that covers the same behavior, none is dropped. Each test asserts the single stored row:
   - CAP-01: one row for the bin, response 200 with `""` body
   - CAP-02: `HEAD`, `OPTIONS`, `PROPFIND`, and `POST` with `_method=DELETE` are stored with the method sent (4 tests)
   - CAP-03: `/github/push`; CAP-04: `/`
@@ -226,11 +226,13 @@ T6 → T7
   - CAP-10: `:zlib.gzip/1` body with `content-encoding: gzip` → compressed bytes stored
   - CAP-11 + CAP-12: `body_size` and `content_type` match the request
   - CAP-16, CAP-17, CAP-18: unknown, expired and view token → 404 and zero rows (3 tests)
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 55 − 6 + 19 = 68 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 55 − 6 + 18 = 67 tests pass (the list above sums to 18; the planned 19 was an arithmetic slip)
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(capture): store every request sent to a live bin`
 
@@ -255,7 +257,7 @@ T6 → T7
   - CAP-08: a `Transfer-Encoding: chunked` POST sent in three chunks → response 200 and the stored body equals the concatenated chunks
   - CAP-19: a POST declaring `content-length: 10` that sends 3 bytes and stalls → response status 408 and zero rows for the bin
 - [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: 68 + 2 = 70 tests pass
+- [ ] Test count: 67 + 2 = 69 tests pass
 
 **Tests**: integration
 **Gate**: full
@@ -281,7 +283,7 @@ T6 → T7
 
 - [ ] The setting sits inside the prod block (prod boot needs secrets, so this is checked by reading the file)
 - [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 70 tests pass
+- [ ] Test count: 69 tests pass
 
 **Tests**: none
 **Gate**: build
