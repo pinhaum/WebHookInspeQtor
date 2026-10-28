@@ -70,11 +70,11 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] `body("")` → `:empty`; valid UTF-8 → `{:text, body}`; `"a" <> <<0xff>>` → `{:hex, ...}` of all bytes
-- [ ] `hex_dump/1` of 17 bytes gives two lines, second offset `00000010`, lowercase hex
-- [ ] `printable/1` escapes each invalid byte as `\xNN`, keeps valid runs, maps `nil` to `""`
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq_web/byte_format_test.exs`
-- [ ] Test count: 70 + new tests pass
+- [x] `body("")` → `:empty`; valid UTF-8 → `{:text, body}`; `"a" <> <<0xff>>` → `{:hex, ...}` of all bytes
+- [x] `hex_dump/1` of 17 bytes gives two lines, second offset `00000010`, lowercase hex
+- [x] `printable/1` escapes each invalid byte as `\xNN`, keeps valid runs, maps `nil` to `""`
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web/byte_format_test.exs`
+- [x] Test count: 70 + new tests pass
 
 **Tests**: unit
 **Gate**: quick
