@@ -410,4 +410,66 @@ defmodule WhiqWeb.BinLiveTest do
       end
     end
   end
+
+  describe "eviction" do
+    defp fill!(bin, count) do
+      for n <- 1..count, do: capture!(bin, %{path: "/fill-#{n}"})
+    end
+
+    defp rendered_row_ids(view), do: view |> render() |> LazyHTML.from_fragment() |> row_ids()
+
+    defp detail_path_of(view) do
+      view |> render() |> LazyHTML.from_fragment() |> text("#detail-path")
+    end
+
+    defp selected_row_ids(view) do
+      view
+      |> render()
+      |> LazyHTML.from_fragment()
+      |> LazyHTML.query("#requests button[aria-current='true']")
+      |> LazyHTML.attribute("id")
+    end
+
+    test "LIVE-04: an evicted request disappears from every open page",
+         %{conn: conn, bin: bin} do
+      [oldest | _] = fill!(bin, 100)
+      {:ok, first, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      {:ok, second, _html} = live(build_conn(), ~p"/bins/#{bin.view_token}")
+
+      latest = capture!(bin, %{path: "/latest"})
+
+      for view <- [first, second] do
+        ids = rendered_row_ids(view)
+        refute has_element?(view, "#requests-#{oldest.id}")
+        assert length(ids) == 100
+        assert hd(ids) == "requests-#{latest.id}"
+      end
+    end
+
+    test "LIVE-14: when the selected request is evicted the newest remaining is selected",
+         %{conn: conn, bin: bin} do
+      [oldest | _] = fill!(bin, 100)
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      view |> element("#requests-#{oldest.id}-select") |> render_click()
+      assert detail_path_of(view) == "/fill-1"
+
+      latest = capture!(bin, %{path: "/latest"})
+
+      assert has_element?(view, "#request-detail")
+      assert detail_path_of(view) == "/latest"
+      assert selected_row_ids(view) == ["requests-#{latest.id}-select"]
+    end
+
+    test "an eviction of an unselected request keeps the current selection",
+         %{conn: conn, bin: bin} do
+      [_oldest, second_oldest | _] = fill!(bin, 100)
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      view |> element("#requests-#{second_oldest.id}-select") |> render_click()
+
+      capture!(bin, %{path: "/latest"})
+
+      assert detail_path_of(view) == "/fill-2"
+      assert selected_row_ids(view) == ["requests-#{second_oldest.id}-select"]
+    end
+  end
 end

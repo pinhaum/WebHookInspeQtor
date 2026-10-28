@@ -305,11 +305,11 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Full bin + 1 capture → the oldest row disappears from every open page (two views), the new row is first
-- [ ] Selected oldest request evicted → `#request-detail` shows the newest remaining request
-- [ ] Unselected eviction keeps the current selection
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] Full bin + 1 capture → the oldest row disappears from every open page (two views), the new row is first
+- [x] Selected oldest request evicted → `#request-detail` shows the newest remaining request
+- [x] Unselected eviction keeps the current selection
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full
