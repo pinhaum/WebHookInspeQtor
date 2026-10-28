@@ -125,10 +125,10 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] A subscriber of bin A receives the stored request (same id) after a capture into A
-- [ ] A subscriber of bin A receives nothing after a capture into bin B
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] A subscriber of bin A receives the stored request (same id) after a capture into A
+- [x] A subscriber of bin A receives nothing after a capture into bin B
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: build

@@ -247,6 +247,30 @@ defmodule Whiq.InspectorTest do
     end
   end
 
+  # The local PubSub adapter delivers during broadcast, so the message is
+  # already in the mailbox when capture_request/2 returns.
+  describe "subscribe/1" do
+    test "LIVE-02: a subscriber of the bin receives the stored request" do
+      {:ok, bin} = Inspector.create_bin()
+      :ok = Inspector.subscribe(bin)
+
+      {:ok, %CapturedRequest{id: id}} = Inspector.capture_request(bin, snapshot())
+
+      assert_received {:request_captured, request}
+      assert request == Repo.get!(CapturedRequest, id)
+    end
+
+    test "LIVE-03: a subscriber of one bin receives nothing for another bin's capture" do
+      {:ok, bin} = Inspector.create_bin()
+      {:ok, other} = Inspector.create_bin()
+      :ok = Inspector.subscribe(bin)
+
+      {:ok, _request} = Inspector.capture_request(other, snapshot())
+
+      refute_received {:request_captured, _}
+    end
+  end
+
   describe "list_requests/1" do
     test "LIVE-01: lists only the bin's requests, newest first" do
       {:ok, bin} = Inspector.create_bin()

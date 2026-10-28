@@ -49,6 +49,9 @@ defmodule Whiq.Inspector do
   the web layer (AD-004); headers are `[{name, value}]` in received order
   and are stored flattened (AD-008). `body_size` and `content_type` are
   derived here so they always agree with the stored bytes.
+
+  Once stored, the request is broadcast as `{:request_captured, request}`
+  to the bin's subscribers (see `subscribe/1`).
   """
   def capture_request(%Bin{} = bin, %{
         method: method,
@@ -58,18 +61,27 @@ defmodule Whiq.Inspector do
         body: body,
         remote_ip: remote_ip
       }) do
-    Repo.insert(%CapturedRequest{
-      bin_id: bin.id,
-      method: method,
-      path: path,
-      query_string: query_string,
-      headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
-      body: body,
-      body_size: byte_size(body),
-      content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
-      remote_ip: remote_ip
-    })
+    with {:ok, request} <-
+           Repo.insert(%CapturedRequest{
+             bin_id: bin.id,
+             method: method,
+             path: path,
+             query_string: query_string,
+             headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
+             body: body,
+             body_size: byte_size(body),
+             content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
+             remote_ip: remote_ip
+           }) do
+      Phoenix.PubSub.broadcast(Whiq.PubSub, topic(bin), {:request_captured, request})
+      {:ok, request}
+    end
   end
+
+  @doc """
+  Subscribes the caller to the requests captured by `bin`.
+  """
+  def subscribe(%Bin{} = bin), do: Phoenix.PubSub.subscribe(Whiq.PubSub, topic(bin))
 
   @doc """
   Lists the bin's captured requests, newest first. Only the summary fields
@@ -109,6 +121,8 @@ defmodule Whiq.Inspector do
       {:error, :not_found}
     end
   end
+
+  defp topic(%Bin{id: id}), do: "bin:#{id}"
 
   # 24 random bytes encode to exactly 32 url-safe base64 characters.
   defp generate_token do
