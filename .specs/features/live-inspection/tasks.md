@@ -180,11 +180,11 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] A capture after mount appears as the first row of every open view of the bin (two views tested)
-- [ ] A capture into another bin leaves the rendered page unchanged
-- [ ] The empty state disappears on the first live arrival
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] A capture after mount appears as the first row of every open view of the bin (two views tested)
+- [x] A capture into another bin leaves the rendered page unchanged
+- [x] The empty state disappears on the first live arrival
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full

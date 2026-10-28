@@ -147,4 +147,46 @@ defmodule WhiqWeb.BinLiveTest do
       refute has_element?(view, "#empty-state")
     end
   end
+
+  # Inspector broadcasts synchronously, so the LiveView has the message in its
+  # mailbox before render/1 asks it for the current HTML.
+  describe "live updates" do
+    test "LIVE-02: a new capture appears first on every open page of the bin",
+         %{conn: conn, bin: bin} do
+      older = capture!(bin)
+      {:ok, view_a, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      {:ok, view_b, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+
+      newer = capture!(bin, %{path: "/live"})
+
+      for view <- [view_a, view_b] do
+        document = view |> render() |> LazyHTML.from_fragment()
+        assert row_ids(document) == ["requests-#{newer.id}", "requests-#{older.id}"]
+        assert text(document, "#requests-#{newer.id}-path") == "/live"
+      end
+    end
+
+    test "LIVE-03: a capture into another bin leaves the page unchanged",
+         %{conn: conn, bin: bin} do
+      {:ok, other} = Inspector.create_bin()
+      capture!(bin)
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      before = render(view)
+
+      capture!(other)
+
+      assert render(view) == before
+    end
+
+    test "LIVE-05: the empty state disappears on the first live arrival",
+         %{conn: conn, bin: bin} do
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      assert has_element?(view, "#empty-state")
+
+      request = capture!(bin)
+
+      refute has_element?(view, "#empty-state")
+      assert has_element?(view, "#requests-#{request.id}")
+    end
+  end
 end

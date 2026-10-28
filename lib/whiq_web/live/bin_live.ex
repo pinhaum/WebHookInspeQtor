@@ -8,6 +8,9 @@ defmodule WhiqWeb.BinLive do
   def mount(%{"token" => token}, _session, socket) do
     case Inspector.fetch_live_bin_by_view_token(token) do
       {:ok, bin} ->
+        # Subscribing before listing means a capture in between arrives twice;
+        # stream_insert replaces it by DOM id.
+        if connected?(socket), do: Inspector.subscribe(bin)
         requests = Inspector.list_requests(bin)
 
         {:ok,
@@ -22,6 +25,14 @@ defmodule WhiqWeb.BinLive do
       {:error, :not_found} ->
         raise WhiqWeb.BinNotFoundError
     end
+  end
+
+  @impl true
+  def handle_info({:request_captured, request}, socket) do
+    {:noreply,
+     socket
+     |> update(:request_count, &(&1 + 1))
+     |> stream_insert(:requests, request, at: 0)}
   end
 
   @impl true
