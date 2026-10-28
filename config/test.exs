@@ -28,6 +28,7 @@ config :whiq, :capture_read_timeout, 200
 
 # Small limits so tests can hit them; the window outlasts any test run.
 config :whiq, :capture_rate_limit, limit: 2, scale_ms: 3_600_000
+config :whiq, :bin_rate_limit, limit: 1, scale_ms: 3_600_000
 
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false

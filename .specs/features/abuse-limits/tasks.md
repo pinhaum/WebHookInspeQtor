@@ -276,12 +276,12 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Config: prod/dev `limit: 10, scale_ms: 3_600_000`; test `limit: 1, scale_ms: 3_600_000`
-- [ ] Tests set a unique `remote_ip` per test; first POST from an IP → redirect to the bin (just under); second → redirect to `/`, flash shown on the home page, bin count unchanged
-- [ ] LIM-10: a second IP still creates a bin while the first is limited
-- [ ] BIN-01 still passes
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] Config: prod/dev `limit: 10, scale_ms: 3_600_000`; test `limit: 1, scale_ms: 3_600_000`
+- [x] Tests set a unique `remote_ip` per test; first POST from an IP → redirect to the bin (just under); second → redirect to `/`, flash shown on the home page, bin count unchanged
+- [x] LIM-10: a second IP still creates a bin while the first is limited
+- [x] BIN-01 still passes
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: build
