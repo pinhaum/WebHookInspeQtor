@@ -11,6 +11,9 @@ defmodule WhiqWeb.PageControllerTest do
 
     assert LazyHTML.attribute(form, "action") == ["/bins"]
     assert LazyHTML.attribute(form, "method") == ["post"]
+
+    button = LazyHTML.query(form, "button#create-bin-button")
+    assert button |> LazyHTML.text() |> String.trim() == "Create bin"
   end
 
   test "the header links the whiq brand home and drops the generator links", %{conn: conn} do
