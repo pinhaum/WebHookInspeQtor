@@ -193,10 +193,10 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Unit tests: configured header with a valid IP wins; invalid header value or no header falls back to the peer address (input distinct from the ConnTest default, L-003)
-- [ ] CAP-14 and CAP-20 tests still pass
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq_web`
-- [ ] Test count: previous + new tests pass
+- [x] Unit tests: configured header with a valid IP wins; invalid header value or no header falls back to the peer address (input distinct from the ConnTest default, L-003)
+- [x] CAP-14 and CAP-20 tests still pass
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: quick

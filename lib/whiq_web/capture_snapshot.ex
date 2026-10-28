@@ -5,6 +5,8 @@ defmodule WhiqWeb.CaptureSnapshot do
   decoded or reordered.
   """
 
+  alias WhiqWeb.ClientIP
+
   @default_read_timeout 15_000
 
   @doc """
@@ -19,7 +21,7 @@ defmodule WhiqWeb.CaptureSnapshot do
       query_string: conn.query_string,
       headers: conn.req_headers,
       body: body,
-      remote_ip: remote_ip(conn)
+      remote_ip: ClientIP.from_conn(conn)
     }
 
     {snapshot, conn}
@@ -39,16 +41,6 @@ defmodule WhiqWeb.CaptureSnapshot do
     case String.split(token_and_path, "/", parts: 2) do
       [_token] -> "/"
       [_token, path] -> "/" <> path
-    end
-  end
-
-  defp remote_ip(conn) do
-    with header when is_binary(header) <- Application.get_env(:whiq, :client_ip_header),
-         [value | _] <- Plug.Conn.get_req_header(conn, header),
-         {:ok, _ip} <- :inet.parse_strict_address(String.to_charlist(value)) do
-      value
-    else
-      _ -> conn.remote_ip |> :inet.ntoa() |> to_string()
     end
   end
 end
