@@ -152,11 +152,11 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] Two captured requests render newest first with all four fields
-- [ ] Empty bin shows `#empty-state` containing `curl` and the capture URL; it disappears once a request exists
-- [ ] BIN-04..12 tests still pass
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] Two captured requests render newest first with all four fields
+- [x] Empty bin shows `#empty-state` containing `curl` and the capture URL; it disappears once a request exists
+- [x] BIN-04..12 tests still pass
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full
