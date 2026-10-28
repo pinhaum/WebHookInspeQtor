@@ -59,6 +59,14 @@ T5 → T6 → T7 → T8
 T9 → T10
 ```
 
+### Phase 4: Fix iteration 1
+
+Verifier gaps from `validation.md` (iteration 0): M13 / SP-1, M18, M16 / M17.
+
+```
+T11 → T12 → T13
+```
+
 ---
 
 ## Task Breakdown
@@ -345,14 +353,103 @@ T9 → T10
 
 ---
 
+## Fix iteration 1
+
+### T11: Prove bin creation keys on the resolved client IP
+
+**What**: `async: false` test that sets `:client_ip_header` to `fly-client-ip` (restored in `on_exit`) and posts every request from the same peer `remote_ip`: two different header values each create a bin; a repeat of one header value is limited. Spec gains one line defining "client IP" for LIM-09/LIM-10 per design.md (SP-1).
+**Where**: `test/whiq_web/controllers/bin_controller_client_ip_test.exs` (new)
+**Depends on**: None (Phase 3)
+**Reuses**: `client_ip_test.exs` env save/restore, `bin_controller_test.exs` helpers
+**Requirement**: LIM-09, LIM-10 (kills M13, closes SP-1)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Same peer, two distinct `fly-client-ip` values → both redirect to a bin, 2 bins
+- [x] Same peer, same `fly-client-ip` value twice → second redirects to `/`, 1 bin
+- [x] Header values unique to the test (shared ETS)
+- [x] Mutation `ClientIP.from_conn(conn)` → `conn.remote_ip` in `bin_controller.ex` fails the test
+- [x] spec.md defines "client IP" for LIM-09/LIM-10
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web/controllers`
+- [x] Test count: previous + new tests pass
+
+**Tests**: integration
+**Gate**: quick
+
+**Commit**: `test(bins): key bin creation limit on the proxy client ip`
+
+---
+
+### T12: Return 404 when the bin vanishes before the lock
+
+**What**: Real-server test: the test process holds `SELECT ... FOR UPDATE` on the bin in its own transaction (sandbox `:auto`), fires the capture from a Task, waits until a backend is blocked on the lock (`pg_locks` / `pg_stat_activity`, no sleep), deletes the bin and commits; the request gets `HTTP/1.1 404` and nothing is stored.
+**Where**: `test/whiq_web/capture_lock_race_test.exs` (new)
+**Depends on**: T11
+**Reuses**: `capture_server_test.exs` Bandit harness, `inspector_concurrency_test.exs` `:auto` sandbox
+**Requirement**: design Error Handling "Bin deleted between lookup and lock → 404" (kills M18)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Capture blocked on the bin lock, bin deleted and committed → status line `HTTP/1.1 404 Not Found`, no stored row
+- [ ] The test waits for a lock-waiting backend before deleting, not a sleep
+- [ ] Mutation 404 → 200 on `{:error, :not_found}` from `capture_request/2` fails the test
+- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq_web/capture_lock_race_test.exs`
+- [ ] Test count: previous + new tests pass
+
+**Tests**: integration
+**Gate**: quick
+
+**Commit**: `test(capture): answer 404 when the bin is deleted before the lock`
+
+---
+
+### T13: Exercise multi-read body accumulation
+
+**What**: Unit test for `CaptureSnapshot.from_conn/1` with a test `Plug.Conn.Adapter` whose `read_req_body/2` returns short `{:more, chunk, state}` chunks regardless of `:length`, then `{:ok, last, state}`.
+**Where**: `test/whiq_web/capture_snapshot_chunked_test.exs` (new)
+**Depends on**: T12
+**Reuses**: `capture_snapshot_test.exs`
+**Requirement**: LIM-01, LIM-02 (kills M16, M17)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Body under the cap split over several short reads → snapshot body byte-identical and in order
+- [ ] Body over the cap split over several short reads → snapshot body is exactly its first `max_body_bytes + 1` bytes
+- [ ] Mutations "reverse chunk order" and "stop at first short `:more`" fail the test
+- [ ] Gate check passes: `docker compose run --rm app mix precommit`
+- [ ] Test count: previous + new tests pass
+
+**Tests**: unit
+**Gate**: build
+
+**Commit**: `test(capture): cover body reads split across short chunks`
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3
+Phase 1 → Phase 2 → Phase 3 → Phase 4
 
 Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4
 Phase 2:  T5 ------→ T6 ------→ T7 ------→ T8
 Phase 3:  T9 ------→ T10
+Phase 4:  T11 -----→ T12 -----→ T13
 ```
 
 ---
@@ -373,6 +470,9 @@ Phase 3:  T9 ------→ T10
 | T8: bin limit | 1 controller action | ✅ Granular |
 | T9: eviction on page | 1 handle_info | ✅ Granular |
 | T10: notice | 1 template element | ✅ Granular |
+| T11: client IP test | 1 test file (+ 1 spec line) | ✅ Granular |
+| T12: lock race test | 1 test file | ✅ Granular |
+| T13: chunked read test | 1 test file | ✅ Granular |
 
 ### Diagram-Definition Cross-Check
 
@@ -388,6 +488,9 @@ Phase 3:  T9 ------→ T10
 | T8 | T7 | T7 → T8 | ✅ Match |
 | T9 | None (Phase 2) | start of Phase 3 | ✅ Match |
 | T10 | T9 | T9 → T10 | ✅ Match |
+| T11 | None (Phase 3) | start of Phase 4 | ✅ Match |
+| T12 | T11 | T11 → T12 | ✅ Match |
+| T13 | T12 | T12 → T13 | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -403,3 +506,6 @@ Phase 3:  T9 ------→ T10
 | T8 | Controllers | integration | integration | ✅ OK |
 | T9 | LiveView | integration | integration | ✅ OK |
 | T10 | LiveView | integration | integration | ✅ OK |
+| T11 | Controllers | integration | integration | ✅ OK |
+| T12 | Controllers / snapshot | integration | integration | ✅ OK |
+| T13 | Controllers / snapshot | integration | unit | ✅ OK (adapter-level unit; no DB) |
