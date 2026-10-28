@@ -13,6 +13,9 @@ defmodule WhiqWeb.PageControllerTest do
     assert LazyHTML.attribute(form, "method") == ["post"]
 
     button = LazyHTML.query(form, "button#create-bin-button")
+    assert Enum.count(button) == 1
+    # A button without a type attribute submits its form.
+    assert LazyHTML.attribute(button, "type") in [[], ["submit"]]
     assert button |> LazyHTML.text() |> String.trim() == "Create bin"
   end
 
