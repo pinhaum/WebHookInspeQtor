@@ -169,14 +169,16 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq_web/live/bin_live_test.exs`:
+- [x] `test/whiq_web/live/bin_live_test.exs`:
   - live bin's view token → `live/2` mounts and `has_element?(view, "#bin-page")`
   - BIN-08, BIN-09, BIN-10, BIN-12: `assert_error_sent 404` for unknown, capture, expired and malformed tokens
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: 19 + 5 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: 19 + 5 tests pass
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(bins): serve bin page only for live view tokens`
 

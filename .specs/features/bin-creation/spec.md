@@ -91,11 +91,11 @@ A visitor needs a fresh, unguessable URL to point a webhook at, and a private pa
 | BIN-05 | P1: Create a bin | - | Pending |
 | BIN-06 | P1: Create a bin | - | Pending |
 | BIN-07 | P1: Create a bin | - | Pending |
-| BIN-08 | P1: Private view URL | T3, T4 | In progress |
-| BIN-09 | P1: Private view URL | T3, T4 | In progress |
-| BIN-10 | P1: Private view URL | T3, T4 | In progress |
+| BIN-08 | P1: Private view URL | T3, T4 | Done |
+| BIN-09 | P1: Private view URL | T3, T4 | Done |
+| BIN-10 | P1: Private view URL | T3, T4 | Done |
 | BIN-11 | P1: Private view URL | - | Pending |
-| BIN-12 | P1: Private view URL | T3, T4 | In progress |
+| BIN-12 | P1: Private view URL | T3, T4 | Done |
 
 **Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
 
