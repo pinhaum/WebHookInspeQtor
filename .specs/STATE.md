@@ -58,4 +58,12 @@
 - **Date**: 2026-10-27
 - **Status**: active
 
+### AD-008
+- **Decision**: Captured request data that a sender controls byte-by-byte (body, header names and values, `content_type`) is stored as `bytea`; headers are a flat `bytea[]` of alternating name/value in received order.
+- **Reason**: Bandit accepts obs-text bytes `0x80-0xFF` in header values (RFC 9110 §5.5); `jsonb` and `text` reject non-UTF-8, which would fail the insert and lose the request.
+- **Trade-off**: No jsonb queries over headers; readers (live-inspection) must handle non-UTF-8 bytes for display and rebuild pairs from the flat list.
+- **Scope**: request-capture, live-inspection
+- **Date**: 2026-10-28
+- **Status**: active
+
 ## Handoff
