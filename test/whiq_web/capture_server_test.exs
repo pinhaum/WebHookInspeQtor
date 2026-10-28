@@ -53,6 +53,18 @@ defmodule WhiqWeb.CaptureServerTest do
     assert [%CapturedRequest{body: "hello world"}] = stored_requests(bin)
   end
 
+  # Plug.Test upcases the method, so case fidelity is only observable over real HTTP.
+  test "CAP-02: a lowercase method is stored with its case", %{bin: bin, socket: socket} do
+    :ok =
+      :gen_tcp.send(
+        socket,
+        "propfind /h/#{bin.capture_token} HTTP/1.1\r\nhost: localhost\r\ncontent-length: 0\r\n\r\n"
+      )
+
+    assert status_line(socket) == "HTTP/1.1 200 OK\r\n"
+    assert [%CapturedRequest{method: "propfind"}] = stored_requests(bin)
+  end
+
   test "CAP-19: a body that stalls past the read timeout is answered 408 and not stored",
        %{bin: bin, socket: socket} do
     :ok =

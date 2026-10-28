@@ -22,6 +22,9 @@ defmodule WhiqWeb.CaptureSnapshotTest do
     Application.delete_env(:whiq, :client_ip_header)
   end
 
+  # A peer address other than Plug.Test's default 127.0.0.1, so a hardcoded fallback fails.
+  defp peer(conn), do: %{conn | remote_ip: {198, 51, 100, 9}}
+
   defp snapshot(conn) do
     {snapshot, %Plug.Conn{}} = CaptureSnapshot.from_conn(conn)
     snapshot
@@ -68,23 +71,23 @@ defmodule WhiqWeb.CaptureSnapshotTest do
   end
 
   test "CAP-14: without a configured header the peer address is the remote_ip" do
-    conn = conn(:post, "/h/#{@token}") |> put_req_header("fly-client-ip", "203.0.113.7")
+    conn = peer(conn(:post, "/h/#{@token}")) |> put_req_header("fly-client-ip", "203.0.113.7")
 
-    assert snapshot(conn).remote_ip == "127.0.0.1"
+    assert snapshot(conn).remote_ip == "198.51.100.9"
   end
 
   test "CAP-20: a configured header that is absent falls back to the peer address" do
     Application.put_env(:whiq, :client_ip_header, "fly-client-ip")
 
-    assert snapshot(conn(:post, "/h/#{@token}")).remote_ip == "127.0.0.1"
+    assert snapshot(peer(conn(:post, "/h/#{@token}"))).remote_ip == "198.51.100.9"
   end
 
   test "CAP-20: a configured header that is not an IP falls back to the peer address" do
     Application.put_env(:whiq, :client_ip_header, "fly-client-ip")
 
-    conn = conn(:post, "/h/#{@token}") |> put_req_header("fly-client-ip", "not-an-ip")
+    conn = peer(conn(:post, "/h/#{@token}")) |> put_req_header("fly-client-ip", "not-an-ip")
 
-    assert snapshot(conn).remote_ip == "127.0.0.1"
+    assert snapshot(conn).remote_ip == "198.51.100.9"
   end
 
   test "CAP-21: a request without a body has an empty body" do
