@@ -164,12 +164,12 @@ T9 → T10
 
 **Done when**:
 
-- [ ] `mix.lock` pins hammer 7.5.0
-- [ ] `check/3` returns `:ok` for hits 1..limit and `{:error, s}` with `s >= 1` for hit limit+1
-- [ ] Two keys count independently
-- [ ] LIM-07: with `scale_ms: 1000`, after a deny, waiting the denied seconds makes the next `check/3` return `:ok`
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] `mix.lock` pins hammer 7.5.0
+- [x] `check/3` returns `:ok` for hits 1..limit and `{:error, s}` with `s >= 1` for hit limit+1
+- [x] Two keys count independently
+- [x] LIM-07: with `scale_ms: 1000`, after a deny, waiting the denied seconds makes the next `check/3` return `:ok`
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: unit
 **Gate**: build
