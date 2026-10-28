@@ -472,4 +472,25 @@ defmodule WhiqWeb.BinLiveTest do
       assert selected_row_ids(view) == ["requests-#{second_oldest.id}-select"]
     end
   end
+
+  describe "truncation notice" do
+    test "LIVE-10: a truncated request shows the truncation notice with its stored size",
+         %{conn: conn, bin: bin} do
+      capture!(bin, %{body: :binary.copy("x", 524_289)})
+
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+
+      notice = view |> render() |> LazyHTML.from_fragment() |> text("#body-truncated")
+      assert notice == "Body truncated: showing the first 524288 bytes"
+    end
+
+    test "LIVE-10: an untruncated request has no truncation notice", %{conn: conn, bin: bin} do
+      capture!(bin, %{body: :binary.copy("x", 524_288)})
+
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+
+      assert has_element?(view, "#request-detail")
+      refute has_element?(view, "#body-truncated")
+    end
+  end
 end

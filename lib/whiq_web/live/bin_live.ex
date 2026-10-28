@@ -223,6 +223,15 @@ defmodule WhiqWeb.BinLive do
 
             <div class="space-y-1">
               <h3 class="text-sm font-semibold">Body</h3>
+              <p
+                :if={@selected.body_truncated}
+                id="body-truncated"
+                role="note"
+                class="alert alert-warning text-sm"
+              >
+                <.icon name="hero-scissors" class="size-5 shrink-0" />
+                Body truncated: showing the first {@selected.body_size} bytes
+              </p>
               <%= case ByteFormat.body(@selected.body) do %>
                 <% :empty -> %>
                   <p id="request-body" data-format="empty" class="text-sm opacity-70">

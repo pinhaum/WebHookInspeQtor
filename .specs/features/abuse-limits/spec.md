@@ -129,10 +129,10 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 | LIM-11 | P1: Ring buffer per bin | T2,T3 | Done |
 | LIM-12 | P1: Capture rate limit | T7 | Done |
 | LIVE-04 | P1: Ring buffer per bin (moved from live-inspection) | T9 | Done |
-| LIVE-10 | P1: Bounded body size (moved from live-inspection) | - | Pending |
+| LIVE-10 | P1: Bounded body size (moved from live-inspection) | T10 | Done |
 | LIVE-14 | P1: Ring buffer per bin (moved from live-inspection) | T9 | Done |
 
-**Coverage:** 15 total, 0 mapped to tasks, 15 unmapped ⚠️
+**Coverage:** 15 total, 15 mapped to tasks, 0 unmapped
 
 ---
 

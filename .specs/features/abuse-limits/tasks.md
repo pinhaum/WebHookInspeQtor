@@ -333,10 +333,10 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Truncated request shows `#body-truncated` with the exact text and `524288`
-- [ ] Untruncated request has no `#body-truncated`
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] Truncated request shows `#body-truncated` with the exact text and `524288`
+- [x] Untruncated request has no `#body-truncated`
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: build
