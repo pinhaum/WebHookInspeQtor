@@ -239,7 +239,7 @@ T7 → T8
 **Tests**: integration
 **Gate**: build
 
-**Manual UAT (pending, for the Verifier)**: open a bin on `http://localhost:4000`, click Copy, paste: the clipboard holds the capture URL.
+**Manual UAT (pending, for the Verifier)**: open a bin on `http://localhost:4000`, click Copy, paste: the clipboard holds the capture URL. Automated browser check 2026-10-28: clicking Copy calls `navigator.clipboard.writeText` with the capture URL; the OS clipboard write itself still needs a human check.
 
 **Status**: ✅ Complete
 
@@ -291,12 +291,14 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq_web/controllers/page_controller_test.exs`: `#site-brand` links to `/`, and no `a[href*="phoenixframework.org"]` remains
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 30 + 1 tests pass
+- [x] `test/whiq_web/controllers/page_controller_test.exs`: `#site-brand` links to `/`, and no `a[href*="phoenixframework.org"]` remains
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 30 + 1 tests pass
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(layout): brand the app header as whiq`
 
