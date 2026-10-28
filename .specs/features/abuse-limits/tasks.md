@@ -415,7 +415,7 @@ T11 → T12 → T13
 
 ### T13: Exercise multi-read body accumulation
 
-**What**: Unit test for `CaptureSnapshot.from_conn/1` with a test `Plug.Conn.Adapter` whose `read_req_body/2` returns short `{:more, chunk, state}` chunks regardless of `:length`, then `{:ok, last, state}`.
+**What**: Unit test for `CaptureSnapshot.from_conn/1` with a test `Plug.Conn.Adapter` whose `read_req_body/2` returns short `{:more, chunk, state}` chunks regardless of `:length`, then `{:ok, last, state}`. The adapter lives in `test/support/short_read_adapter.ex` (one module per file).
 **Where**: `test/whiq_web/capture_snapshot_chunked_test.exs` (new)
 **Depends on**: T12
 **Reuses**: `capture_snapshot_test.exs`
@@ -428,11 +428,11 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Body under the cap split over several short reads → snapshot body byte-identical and in order
-- [ ] Body over the cap split over several short reads → snapshot body is exactly its first `max_body_bytes + 1` bytes
-- [ ] Mutations "reverse chunk order" and "stop at first short `:more`" fail the test
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] Body under the cap split over several short reads → snapshot body byte-identical and in order
+- [x] Body over the cap split over several short reads → snapshot body is exactly its first `max_body_bytes + 1` bytes
+- [x] Mutations "reverse chunk order" and "stop at first short `:more`" fail the test
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: unit
 **Gate**: build
