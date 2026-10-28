@@ -136,17 +136,19 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq/inspector_test.exs` has one test per case:
+- [x] `test/whiq/inspector_test.exs` has one test per case:
   - valid view token of a live bin → `{:ok, %Bin{id: ^id}}`
   - BIN-08: well-formed unknown token → `{:error, :not_found}`
   - BIN-09: the bin's `capture_token` → `{:error, :not_found}`
   - BIN-10: a bin whose `expires_at` was moved to the past (`Repo.update_all`) → `{:error, :not_found}`
   - BIN-12: tokens with `.`, `/`, `+`, `=` and wrong length → `{:error, :not_found}`, with a `:telemetry` handler on `[:whiq, :repo, :query]` receiving zero events
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 14 + 5 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 14 + 5 tests pass
 
 **Tests**: integration
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(inspector): look up live bins by view token`
 

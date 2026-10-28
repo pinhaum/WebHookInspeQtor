@@ -4,10 +4,13 @@ defmodule Whiq.Inspector do
   for bins directly.
   """
 
+  import Ecto.Query
+
   alias Whiq.Inspector.Bin
   alias Whiq.Repo
 
   @ttl_days 7
+  @token_format ~r/\A[A-Za-z0-9_-]{32}\z/
 
   @doc """
   Creates a bin with fresh capture and view tokens, expiring #{@ttl_days} days
@@ -22,6 +25,26 @@ defmodule Whiq.Inspector do
       inserted_at: now,
       expires_at: DateTime.add(now, @ttl_days, :day)
     })
+  end
+
+  @doc """
+  Fetches an unexpired bin by its view token. A token outside the token
+  format is rejected before any query runs.
+  """
+  def fetch_live_bin_by_view_token(token) when is_binary(token) do
+    if token =~ @token_format do
+      now = DateTime.utc_now(:second)
+
+      Bin
+      |> where([b], b.view_token == ^token and b.expires_at > ^now)
+      |> Repo.one()
+      |> case do
+        nil -> {:error, :not_found}
+        bin -> {:ok, bin}
+      end
+    else
+      {:error, :not_found}
+    end
   end
 
   # 24 random bytes encode to exactly 32 url-safe base64 characters.

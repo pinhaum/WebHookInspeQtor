@@ -30,4 +30,66 @@ defmodule Whiq.InspectorTest do
       assert DateTime.diff(bin.expires_at, bin.inserted_at) == 7 * 86_400
     end
   end
+
+  describe "fetch_live_bin_by_view_token/1" do
+    test "returns the live bin for its view token" do
+      {:ok, %Bin{id: id, view_token: view_token}} = Inspector.create_bin()
+
+      assert {:ok, %Bin{id: ^id}} = Inspector.fetch_live_bin_by_view_token(view_token)
+    end
+
+    test "BIN-08: a well-formed token that matches no bin is not found" do
+      {:ok, _bin} = Inspector.create_bin()
+
+      assert Inspector.fetch_live_bin_by_view_token(String.duplicate("A", 32)) ==
+               {:error, :not_found}
+    end
+
+    test "BIN-09: the bin's capture token is not found" do
+      {:ok, bin} = Inspector.create_bin()
+
+      assert Inspector.fetch_live_bin_by_view_token(bin.capture_token) == {:error, :not_found}
+    end
+
+    test "BIN-10: a bin past its expires_at is not found" do
+      {:ok, bin} = Inspector.create_bin()
+      past = DateTime.add(DateTime.utc_now(:second), -1, :second)
+      Repo.update_all(from(b in Bin, where: b.id == ^bin.id), set: [expires_at: past])
+
+      assert Inspector.fetch_live_bin_by_view_token(bin.view_token) == {:error, :not_found}
+    end
+
+    test "BIN-12: a malformed token is not found without querying the database" do
+      test_pid = self()
+      handler_id = {__MODULE__, test_pid}
+
+      :telemetry.attach(
+        handler_id,
+        [:whiq, :repo, :query],
+        fn _event, _measurements, _metadata, _config ->
+          if self() == test_pid, do: send(test_pid, :repo_query)
+        end,
+        nil
+      )
+
+      on_exit(fn -> :telemetry.detach(handler_id) end)
+
+      valid_prefix = String.duplicate("a", 31)
+
+      malformed = [
+        valid_prefix <> ".",
+        valid_prefix <> "/",
+        valid_prefix <> "+",
+        valid_prefix <> "=",
+        valid_prefix,
+        valid_prefix <> "aa"
+      ]
+
+      for token <- malformed do
+        assert Inspector.fetch_live_bin_by_view_token(token) == {:error, :not_found}
+      end
+
+      refute_received :repo_query
+    end
+  end
 end
