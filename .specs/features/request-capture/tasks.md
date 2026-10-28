@@ -176,7 +176,7 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `test/whiq_web/capture_snapshot_test.exs` (`async: false`, env restored in `on_exit`), conns built with `Plug.Test.conn/3`:
+- [x] `test/whiq_web/capture_snapshot_test.exs` (`async: false`, env restored in `on_exit`), conns built with `Plug.Test.conn/3`:
   - CAP-02: `"PROPFIND"` is kept
   - CAP-03: `/h/<token>/github/push` → `"/github/push"`; `/h/<token>/a%20b` → `"/a%20b"`
   - CAP-04: `/h/<token>` → `"/"`
@@ -188,11 +188,13 @@ T6 → T7
   - CAP-20: header configured but absent → the peer address
   - CAP-20: header configured with `"not-an-ip"` → the peer address
   - CAP-21: no body → `""`
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq_web/capture_snapshot_test.exs`
-- [ ] Test count: 44 + 11 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web/capture_snapshot_test.exs`
+- [x] Test count: 44 + 11 tests pass
 
 **Tests**: integration
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(capture): build plain snapshots from captured connections`
 
