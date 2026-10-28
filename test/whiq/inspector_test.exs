@@ -3,6 +3,7 @@ defmodule Whiq.InspectorTest do
 
   alias Whiq.Inspector
   alias Whiq.Inspector.Bin
+  alias Whiq.Inspector.CapturedRequest
 
   @token_format ~r/\A[A-Za-z0-9_-]{32}\z/
 
@@ -90,6 +91,159 @@ defmodule Whiq.InspectorTest do
       end
 
       refute_received :repo_query
+    end
+  end
+
+  describe "fetch_live_bin_by_capture_token/1" do
+    test "returns the live bin for its capture token" do
+      {:ok, %Bin{id: id, capture_token: capture_token}} = Inspector.create_bin()
+
+      assert {:ok, %Bin{id: ^id}} = Inspector.fetch_live_bin_by_capture_token(capture_token)
+    end
+
+    test "CAP-16: a well-formed token that matches no bin is not found" do
+      {:ok, _bin} = Inspector.create_bin()
+
+      assert Inspector.fetch_live_bin_by_capture_token(String.duplicate("A", 32)) ==
+               {:error, :not_found}
+    end
+
+    test "CAP-16: a malformed token is not found without querying the database" do
+      test_pid = self()
+      handler_id = {__MODULE__, :capture, test_pid}
+
+      :telemetry.attach(
+        handler_id,
+        [:whiq, :repo, :query],
+        fn _event, _measurements, _metadata, _config ->
+          if self() == test_pid, do: send(test_pid, :repo_query)
+        end,
+        nil
+      )
+
+      on_exit(fn -> :telemetry.detach(handler_id) end)
+
+      valid_prefix = String.duplicate("a", 31)
+
+      for token <- [valid_prefix <> ".", valid_prefix, valid_prefix <> "aa"] do
+        assert Inspector.fetch_live_bin_by_capture_token(token) == {:error, :not_found}
+      end
+
+      refute_received :repo_query
+    end
+
+    test "CAP-17: a bin past its expires_at is not found" do
+      {:ok, bin} = Inspector.create_bin()
+      past = DateTime.add(DateTime.utc_now(:second), -1, :second)
+      Repo.update_all(from(b in Bin, where: b.id == ^bin.id), set: [expires_at: past])
+
+      assert Inspector.fetch_live_bin_by_capture_token(bin.capture_token) == {:error, :not_found}
+    end
+
+    test "CAP-18: the bin's view token is not found" do
+      {:ok, bin} = Inspector.create_bin()
+
+      assert Inspector.fetch_live_bin_by_capture_token(bin.view_token) == {:error, :not_found}
+    end
+  end
+
+  describe "capture_request/2" do
+    defp snapshot(overrides \\ %{}) do
+      Map.merge(
+        %{
+          method: "POST",
+          path: "/github/push",
+          query_string: "b=2&a=%20",
+          headers: [{"content-type", "application/json"}, {"x-a", "1"}],
+          body: ~s({"ok":true}),
+          remote_ip: "203.0.113.7"
+        },
+        overrides
+      )
+    end
+
+    defp capture!(bin, snapshot) do
+      {:ok, %CapturedRequest{id: id}} = Inspector.capture_request(bin, snapshot)
+      Repo.get!(CapturedRequest, id)
+    end
+
+    test "stores every snapshot field as given for the bin" do
+      {:ok, bin} = Inspector.create_bin()
+
+      stored = capture!(bin, snapshot())
+
+      assert stored.bin_id == bin.id
+      assert stored.method == "POST"
+      assert stored.path == "/github/push"
+      assert stored.query_string == "b=2&a=%20"
+      assert stored.headers == ["content-type", "application/json", "x-a", "1"]
+      assert stored.body == ~s({"ok":true})
+      assert stored.remote_ip == "203.0.113.7"
+      assert %DateTime{microsecond: {_, 6}} = stored.inserted_at
+    end
+
+    test "CAP-06: repeated headers are stored as flat pairs in received order" do
+      {:ok, bin} = Inspector.create_bin()
+      headers = [{"x-a", "1"}, {"x-b", "2"}, {"x-a", "3"}]
+
+      stored = capture!(bin, snapshot(%{headers: headers}))
+
+      assert stored.headers == ["x-a", "1", "x-b", "2", "x-a", "3"]
+    end
+
+    test "CAP-06: a header value with non-UTF-8 bytes round-trips" do
+      {:ok, bin} = Inspector.create_bin()
+      value = <<0xFF, 0x80>>
+
+      stored = capture!(bin, snapshot(%{headers: [{"x-raw", value}]}))
+
+      assert stored.headers == ["x-raw", value]
+    end
+
+    test "CAP-07: a random binary body round-trips byte-for-byte" do
+      {:ok, bin} = Inspector.create_bin()
+      body = :crypto.strong_rand_bytes(1024)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == body
+    end
+
+    test "CAP-11: body_size is the byte size of the body" do
+      {:ok, bin} = Inspector.create_bin()
+
+      stored = capture!(bin, snapshot(%{body: "é"}))
+
+      assert stored.body_size == 2
+    end
+
+    test "CAP-12: content_type comes from the content-type header, nil without it" do
+      {:ok, bin} = Inspector.create_bin()
+
+      with_header = capture!(bin, snapshot(%{headers: [{"content-type", "text/plain; a=b"}]}))
+      without_header = capture!(bin, snapshot(%{headers: [{"x-a", "1"}]}))
+
+      assert with_header.content_type == "text/plain; a=b"
+      assert without_header.content_type == nil
+    end
+
+    test "CAP-15: a Plug.Conn is rejected and nothing is stored" do
+      {:ok, bin} = Inspector.create_bin()
+
+      assert_raise FunctionClauseError, fn ->
+        Inspector.capture_request(bin, Plug.Test.conn(:post, "/h/token", "body"))
+      end
+
+      assert Repo.aggregate(CapturedRequest, :count) == 0
+    end
+
+    test "CAP-21: an empty body is stored as an empty binary with body_size 0" do
+      {:ok, bin} = Inspector.create_bin()
+
+      stored = capture!(bin, snapshot(%{body: ""}))
+
+      assert stored.body == ""
+      assert stored.body_size == 0
     end
   end
 end

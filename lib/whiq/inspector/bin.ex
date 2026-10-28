@@ -11,6 +11,8 @@ defmodule Whiq.Inspector.Bin do
     field :view_token, :string
     field :expires_at, :utc_datetime
 
+    has_many :requests, Whiq.Inspector.CapturedRequest
+
     timestamps(type: :utc_datetime, updated_at: false)
   end
 end

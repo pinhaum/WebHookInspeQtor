@@ -27,7 +27,7 @@ The core promise of the inspector is fidelity: what the bin shows must be what t
 | --------------------- | -------------- | --------- | ---------- |
 | Response to the sender | 200 with empty body | Webhook.site-like default; custom responses come later | y |
 | Recorded path | Subpath after the token, `"/"` when none | The token is already known from the bin; the subpath is the useful part | y |
-| Header storage | Ordered list of `[name, value]` pairs (jsonb) | Repeated headers are valid HTTP | y |
+| Header storage | Ordered pairs flattened into a `bytea[]` (`[n1, v1, n2, v2, ...]`), AD-008 | Repeated headers are valid HTTP; values may hold obs-text bytes `0x80–0xFF` that jsonb rejects | y |
 | Header order | Order as delivered by Bandit in `req_headers` | The adapter is the earliest point we can observe | y |
 | Remote IP source | `fly-client-ip` header in prod (configured); socket peer address elsewhere | Deploy target is Fly.io; the header is set by the proxy | y |
 | `fly-client-ip` spoofing | Trust the header; DEL-07 tests a forged value after deploy. Fallback if it fails: parse `x-forwarded-for` from the right with the `remote_ip` library | Fly docs do not state whether a client-supplied value is overwritten; community reports say it reflects the real IP. Exposure until tested: the bin-creation rate limit (LIM-09) could be bypassed | y |
@@ -96,29 +96,29 @@ The core promise of the inspector is fidelity: what the bin shows must be what t
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| CAP-01 | P1: Capture any request faithfully | - | Pending |
-| CAP-02 | P1: Capture any request faithfully | - | Pending |
-| CAP-03 | P1: Capture any request faithfully | - | Pending |
-| CAP-04 | P1: Capture any request faithfully | - | Pending |
-| CAP-05 | P1: Capture any request faithfully | - | Pending |
-| CAP-06 | P1: Capture any request faithfully | - | Pending |
-| CAP-07 | P1: Capture any request faithfully | - | Pending |
-| CAP-08 | P1: Capture any request faithfully | - | Pending |
-| CAP-09 | P1: Capture any request faithfully | - | Pending |
-| CAP-10 | P1: Capture any request faithfully | - | Pending |
-| CAP-11 | P1: Capture any request faithfully | - | Pending |
-| CAP-12 | P1: Capture any request faithfully | - | Pending |
-| CAP-13 | P1: Capture any request faithfully | - | Pending |
-| CAP-14 | P1: Capture any request faithfully | - | Pending |
-| CAP-15 | P1: Capture any request faithfully | - | Pending |
-| CAP-16 | P1: Reject captures for missing bins | - | Pending |
-| CAP-17 | P1: Reject captures for missing bins | - | Pending |
-| CAP-18 | P1: Reject captures for missing bins | - | Pending |
-| CAP-19 | P1: Reject captures for missing bins | - | Pending |
-| CAP-20 | P1: Capture any request faithfully | - | Pending |
-| CAP-21 | P1: Capture any request faithfully | - | Pending |
+| CAP-01 | P1: Capture any request faithfully | T1,T5 | Done |
+| CAP-02 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-03 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-04 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-05 | P1: Capture any request faithfully | T4,T5 | Done |
+| CAP-06 | P1: Capture any request faithfully | T3,T4,T5 | Done |
+| CAP-07 | P1: Capture any request faithfully | T3,T4,T5 | Done |
+| CAP-08 | P1: Capture any request faithfully | T6 | Done |
+| CAP-09 | P1: Capture any request faithfully | T5 | Done |
+| CAP-10 | P1: Capture any request faithfully | T5 | Done |
+| CAP-11 | P1: Capture any request faithfully | T3,T5 | Done |
+| CAP-12 | P1: Capture any request faithfully | T3,T5 | Done |
+| CAP-13 | P1: Capture any request faithfully | T4,T7 | Done |
+| CAP-14 | P1: Capture any request faithfully | T4 | Done |
+| CAP-15 | P1: Capture any request faithfully | T3 | Done |
+| CAP-16 | P1: Reject captures for missing bins | T2,T5 | Done |
+| CAP-17 | P1: Reject captures for missing bins | T2,T5 | Done |
+| CAP-18 | P1: Reject captures for missing bins | T2,T5 | Done |
+| CAP-19 | P1: Reject captures for missing bins | T6 | Done |
+| CAP-20 | P1: Capture any request faithfully | T4 | Done |
+| CAP-21 | P1: Capture any request faithfully | T3,T4 | Done |
 
-**Coverage:** 21 total, 0 mapped to tasks, 21 unmapped ⚠️
+**Coverage:** 21 total, 21 mapped to tasks, 0 unmapped
 
 ---
 

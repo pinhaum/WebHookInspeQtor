@@ -73,6 +73,9 @@ if config_env() == :prod do
 
   config :whiq, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  # Fly.io's proxy sets the real client address; the socket peer is the proxy.
+  config :whiq, :client_ip_header, "fly-client-ip"
+
   config :whiq, WhiqWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [

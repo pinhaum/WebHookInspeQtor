@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 3,
+  "next_id": 6,
   "lessons": [
     {
       "id": "L-001",
@@ -40,6 +40,60 @@
       ],
       "created": "2026-10-28T13:18:18Z",
       "last_seen": "2026-10-28T13:18:18Z"
+    },
+    {
+      "id": "L-003",
+      "key": "surviving_mutant::assert a fallback with an input that differs from the test harness default so a hardcoded constant cannot pass",
+      "text": "Assert a fallback with an input that differs from the test harness default, so a hardcoded constant cannot pass",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "request-capture"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M10 lib/whiq_web/capture_snapshot.ex:51 (CAP-14, CAP-20) (tests)"
+      ],
+      "created": "2026-10-28T17:39:31Z",
+      "last_seen": "2026-10-28T17:39:31Z"
+    },
+    {
+      "id": "L-004",
+      "key": "surviving_mutant::test method case fidelity over a real server because plug test and conntest upcase the http method",
+      "text": "Test method-case fidelity over a real server, because Plug.Test and ConnTest upcase the HTTP method",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "request-capture"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M15 lib/whiq_web/capture_snapshot.ex:17 (CAP-02) (routes)"
+      ],
+      "created": "2026-10-28T17:39:31Z",
+      "last_seen": "2026-10-28T17:39:31Z"
+    },
+    {
+      "id": "L-005",
+      "key": "spec_precision_gap::name the encoding case and repetition variants an ac covers when it says raw or exactly as sent",
+      "text": "Name the encoding, case and repetition variants an AC covers when it says raw or exactly as sent",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "request-capture"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "CAP-02, CAP-03, CAP-12 (validation.md spec-precision gaps) (spec)"
+      ],
+      "created": "2026-10-28T17:39:31Z",
+      "last_seen": "2026-10-28T17:39:31Z"
     }
   ]
 }
