@@ -23,6 +23,9 @@ config :whiq, WhiqWeb.Endpoint,
 # In test we don't send emails
 config :whiq, Whiq.Mailer, adapter: Swoosh.Adapters.Test
 
+# Keeps the capture read-timeout test (CAP-19) fast; prod uses the 15 s default.
+config :whiq, :capture_read_timeout, 200
+
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 

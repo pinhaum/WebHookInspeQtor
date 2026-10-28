@@ -253,14 +253,16 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `test/whiq_web/capture_server_test.exs` (`async: false`):
+- [x] `test/whiq_web/capture_server_test.exs` (`async: false`):
   - CAP-08: a `Transfer-Encoding: chunked` POST sent in three chunks → response 200 and the stored body equals the concatenated chunks
   - CAP-19: a POST declaring `content-length: 10` that sends 3 bytes and stalls → response status 408 and zero rows for the bin
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: 67 + 2 = 69 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: 67 + 2 = 69 tests pass
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
 
 **Commit**: `test(capture): cover chunked bodies and read timeouts over real http`
 
