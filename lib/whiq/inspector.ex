@@ -71,6 +71,29 @@ defmodule Whiq.Inspector do
     })
   end
 
+  @doc """
+  Lists the bin's captured requests, newest first. Only the summary fields
+  (`id`, `method`, `path`, `body_size`, `inserted_at`) are loaded; the rest
+  are `nil`.
+  """
+  def list_requests(%Bin{id: bin_id}) do
+    CapturedRequest
+    |> where([r], r.bin_id == ^bin_id)
+    |> order_by([r], desc: r.inserted_at, desc: r.id)
+    |> select([r], struct(r, [:id, :method, :path, :body_size, :inserted_at]))
+    |> Repo.all()
+  end
+
+  @doc """
+  Fetches a full captured request, only when it belongs to `bin`.
+  """
+  def fetch_request(%Bin{id: bin_id}, id) when is_integer(id) do
+    case Repo.get_by(CapturedRequest, id: id, bin_id: bin_id) do
+      nil -> {:error, :not_found}
+      request -> {:ok, request}
+    end
+  end
+
   defp fetch_live_bin(field, token) do
     if token =~ @token_format do
       now = DateTime.utc_now(:second)

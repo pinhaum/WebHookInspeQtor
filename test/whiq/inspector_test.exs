@@ -246,4 +246,59 @@ defmodule Whiq.InspectorTest do
       assert stored.body_size == 0
     end
   end
+
+  describe "list_requests/1" do
+    test "LIVE-01: lists only the bin's requests, newest first" do
+      {:ok, bin} = Inspector.create_bin()
+      {:ok, other} = Inspector.create_bin()
+      older = capture!(bin, snapshot(%{path: "/older"}))
+      newer = capture!(bin, snapshot(%{path: "/newer"}))
+      _foreign = capture!(other, snapshot())
+
+      assert Enum.map(Inspector.list_requests(bin), & &1.id) == [newer.id, older.id]
+    end
+
+    test "LIVE-01: requests with the same timestamp are ordered by id, newest first" do
+      {:ok, bin} = Inspector.create_bin()
+      first = capture!(bin, snapshot())
+      second = capture!(bin, snapshot())
+
+      Repo.update_all(from(r in CapturedRequest, where: r.bin_id == ^bin.id),
+        set: [inserted_at: first.inserted_at]
+      )
+
+      assert Enum.map(Inspector.list_requests(bin), & &1.id) == [second.id, first.id]
+    end
+
+    test "LIVE-01: loads method, path, body size and timestamp but not body or headers" do
+      {:ok, bin} = Inspector.create_bin()
+      stored = capture!(bin, snapshot())
+
+      assert [listed] = Inspector.list_requests(bin)
+      assert listed.id == stored.id
+      assert listed.method == "POST"
+      assert listed.path == "/github/push"
+      assert listed.body_size == byte_size(~s({"ok":true}))
+      assert listed.inserted_at == stored.inserted_at
+      assert listed.body == nil
+      assert listed.headers == nil
+    end
+  end
+
+  describe "fetch_request/2" do
+    test "LIVE-06: returns the full request when it belongs to the bin" do
+      {:ok, bin} = Inspector.create_bin()
+      stored = capture!(bin, snapshot())
+
+      assert Inspector.fetch_request(bin, stored.id) == {:ok, stored}
+    end
+
+    test "LIVE-06: another bin's request is not found" do
+      {:ok, bin} = Inspector.create_bin()
+      {:ok, other} = Inspector.create_bin()
+      foreign = capture!(other, snapshot())
+
+      assert Inspector.fetch_request(bin, foreign.id) == {:error, :not_found}
+    end
+  end
 end

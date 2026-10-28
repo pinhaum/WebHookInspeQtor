@@ -98,10 +98,10 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] List returns only the bin's rows, newest first, with `body` and `headers` not loaded
-- [ ] `fetch_request/2` returns the full row for the bin and `{:error, :not_found}` for another bin's id
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq/inspector_test.exs`
-- [ ] Test count: previous + new tests pass
+- [x] List returns only the bin's rows, newest first, with `body` and `headers` not loaded
+- [x] `fetch_request/2` returns the full row for the bin and `{:error, :not_found}` for another bin's id
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq/inspector_test.exs`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: quick
