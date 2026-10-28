@@ -247,12 +247,12 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Config: prod/dev `limit: 60, scale_ms: 60_000`; test `limit: 2, scale_ms: 3_600_000`
-- [ ] Captures 1 and 2 → 200 (just under); capture 3 → 429 with an integer `retry-after` >= 1 and the bin still holds 2 rows
-- [ ] LIM-12: a full bin (100 rows) that gets 429 still holds the same 100 ids
-- [ ] LIM-08: while bin A is limited, a capture into bin B → 200
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] Config: prod/dev `limit: 60, scale_ms: 60_000`; test `limit: 2, scale_ms: 3_600_000`
+- [x] Captures 1 and 2 → 200 (just under); capture 3 → 429 with an integer `retry-after` >= 1 and the bin still holds 2 rows
+- [x] LIM-12: a full bin (100 rows) that gets 429 still holds the same 100 ids
+- [x] LIM-08: while bin A is limited, a capture into bin B → 200
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full

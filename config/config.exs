@@ -14,6 +14,8 @@ config :whiq,
 # Abuse limits (AD-007): bytes stored per body, requests kept per bin.
 config :whiq, :max_body_bytes, 524_288
 config :whiq, :max_requests_per_bin, 100
+# Fixed-window rate limits: captures per bin.
+config :whiq, :capture_rate_limit, limit: 60, scale_ms: 60_000
 
 # Configure the endpoint
 config :whiq, WhiqWeb.Endpoint,
