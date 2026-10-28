@@ -208,13 +208,13 @@ T4 → T5 → T6 → T7
 
 **Done when**:
 
-- [ ] Newest request is the one detailed on load
-- [ ] Every field and header pair (including a repeated header name) renders in stored order
-- [ ] `<script>` in a header, the query string and the body renders as text and adds no `script` element
-- [ ] `0xff` in a header value and in the body renders (`\xff`, hex dump) without crashing the view
-- [ ] Empty body shows "(empty body)"
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: previous + new tests pass
+- [x] Newest request is the one detailed on load
+- [x] Every field and header pair (including a repeated header name) renders in stored order
+- [x] `<script>` in a header, the query string and the body renders as text and adds no `script` element
+- [x] `0xff` in a header value and in the body renders (`\xff`, hex dump) without crashing the view
+- [x] Empty body shows "(empty body)"
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: full

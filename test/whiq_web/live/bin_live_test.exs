@@ -106,6 +106,7 @@ defmodule WhiqWeb.BinLiveTest do
              ]
     end
   end
+
   describe "request list" do
     test "LIVE-01: lists captured requests newest first with method, path, timestamp and size",
          %{conn: conn, bin: bin} do
@@ -119,12 +120,18 @@ defmodule WhiqWeb.BinLiveTest do
 
       assert text(document, "#requests-#{newer.id}-method") == "DELETE"
       assert text(document, "#requests-#{newer.id}-path") == "/newer"
-      assert text(document, "#requests-#{newer.id}-time") == DateTime.to_iso8601(newer.inserted_at)
+
+      assert text(document, "#requests-#{newer.id}-time") ==
+               DateTime.to_iso8601(newer.inserted_at)
+
       assert text(document, "#requests-#{newer.id}-size") == "0 bytes"
 
       assert text(document, "#requests-#{older.id}-method") == "PUT"
       assert text(document, "#requests-#{older.id}-path") == "/older"
-      assert text(document, "#requests-#{older.id}-time") == DateTime.to_iso8601(older.inserted_at)
+
+      assert text(document, "#requests-#{older.id}-time") ==
+               DateTime.to_iso8601(older.inserted_at)
+
       assert text(document, "#requests-#{older.id}-size") == "3 bytes"
     end
 
@@ -187,6 +194,143 @@ defmodule WhiqWeb.BinLiveTest do
 
       refute has_element?(view, "#empty-state")
       assert has_element?(view, "#requests-#{request.id}")
+    end
+  end
+
+  describe "request detail" do
+    defp detail(conn, bin) do
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      {view, view |> render() |> LazyHTML.from_fragment()}
+    end
+
+    defp header_pairs(document) do
+      document
+      |> LazyHTML.query("#request-headers > li")
+      |> Enum.map(fn header ->
+        {text(header, "[id$='-name']"), text(header, "[id$='-value']")}
+      end)
+    end
+
+    defp body(document) do
+      body = LazyHTML.query(document, "#request-body")
+      {LazyHTML.attribute(body, "data-format"), LazyHTML.text(body)}
+    end
+
+    test "LIVE-12: the newest request is detailed on load", %{conn: conn, bin: bin} do
+      capture!(bin, %{path: "/older"})
+      newer = capture!(bin, %{path: "/newer"})
+
+      {_view, document} = detail(conn, bin)
+
+      assert text(document, "#detail-path") == "/newer"
+      assert text(document, "#detail-time") == DateTime.to_iso8601(newer.inserted_at)
+    end
+
+    test "LIVE-06: shows every field and every header pair in stored order",
+         %{conn: conn, bin: bin} do
+      request =
+        capture!(bin, %{
+          method: "PATCH",
+          path: "/github/push",
+          query_string: "b=2&a=%20",
+          headers: [
+            {"content-type", "text/plain; charset=utf-8"},
+            {"x-a", "1"},
+            {"x-b", "2"},
+            {"x-a", "3"}
+          ],
+          body: "hello",
+          remote_ip: "198.51.100.4"
+        })
+
+      {_view, document} = detail(conn, bin)
+
+      assert text(document, "#detail-method") == "PATCH"
+      assert text(document, "#detail-path") == "/github/push"
+      assert text(document, "#detail-query") == "b=2&a=%20"
+      assert text(document, "#detail-content-type") == "text/plain; charset=utf-8"
+      assert text(document, "#detail-remote-ip") == "198.51.100.4"
+      assert text(document, "#detail-time") == DateTime.to_iso8601(request.inserted_at)
+      assert text(document, "#detail-size") == "5 bytes"
+
+      assert header_pairs(document) == [
+               {"content-type", "text/plain; charset=utf-8"},
+               {"x-a", "1"},
+               {"x-b", "2"},
+               {"x-a", "3"}
+             ]
+    end
+
+    test "LIVE-07: a valid UTF-8 body is shown as text", %{conn: conn, bin: bin} do
+      capture!(bin, %{body: "olá\nmundo"})
+
+      {_view, document} = detail(conn, bin)
+
+      assert body(document) == {["text"], "olá\nmundo"}
+    end
+
+    test "LIVE-08: a non-UTF-8 body is shown as a hex dump", %{conn: conn, bin: bin} do
+      capture!(bin, %{body: <<0xFF, 0x00, 0x41>>})
+
+      {_view, document} = detail(conn, bin)
+
+      assert body(document) == {["hex"], "00000000  ff 00 41"}
+    end
+
+    test "LIVE-15: invalid UTF-8 after the first byte hex-dumps the whole body",
+         %{conn: conn, bin: bin} do
+      capture!(bin, %{body: "ok" <> <<0xFF>>})
+
+      {_view, document} = detail(conn, bin)
+
+      assert body(document) == {["hex"], "00000000  6f 6b ff"}
+    end
+
+    test "LIVE-09: an empty body shows (empty body)", %{conn: conn, bin: bin} do
+      capture!(bin, %{body: ""})
+
+      {_view, document} = detail(conn, bin)
+
+      assert {["empty"], text} = body(document)
+      assert String.trim(text) == "(empty body)"
+    end
+
+    test "LIVE-11: captured markup renders as escaped text, never as elements",
+         %{conn: conn, bin: bin} do
+      script = "<script>alert(1)</script>"
+
+      capture!(bin, %{
+        query_string: "q=" <> script,
+        headers: [{"x-evil", script}, {"x-" <> script, "1"}],
+        body: script
+      })
+
+      {_view, document} = detail(conn, bin)
+
+      assert document |> LazyHTML.query("#request-detail script") |> Enum.count() == 0
+      assert text(document, "#detail-query") == "q=" <> script
+      assert header_pairs(document) == [{"x-evil", script}, {"x-" <> script, "1"}]
+      assert body(document) == {["text"], script}
+    end
+
+    test "LIVE-11/AD-008: non-UTF-8 header values and content type render escaped",
+         %{conn: conn, bin: bin} do
+      capture!(bin, %{
+        headers: [{"content-type", "text/plain" <> <<0xFF>>}, {"x-raw", <<0xFF, 0x80>>}],
+        body: <<0xFF>>
+      })
+
+      {view, document} = detail(conn, bin)
+
+      assert text(document, "#detail-content-type") == "text/plain\\xff"
+
+      assert header_pairs(document) == [
+               {"content-type", "text/plain\\xff"},
+               {"x-raw", "\\xff\\x80"}
+             ]
+
+      assert body(document) == {["hex"], "00000000  ff"}
+      assert render(view) |> String.valid?()
     end
   end
 end
