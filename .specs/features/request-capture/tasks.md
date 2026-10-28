@@ -283,12 +283,14 @@ T6 → T7
 
 **Done when**:
 
-- [ ] The setting sits inside the prod block (prod boot needs secrets, so this is checked by reading the file)
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: 69 tests pass
+- [x] The setting sits inside the prod block (prod boot needs secrets, so this is checked by reading the file)
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: 69 tests pass
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(config): read client ip from fly-client-ip in production`
 

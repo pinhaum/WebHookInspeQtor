@@ -108,7 +108,7 @@ The core promise of the inspector is fidelity: what the bin shows must be what t
 | CAP-10 | P1: Capture any request faithfully | T5 | Done |
 | CAP-11 | P1: Capture any request faithfully | T3,T5 | Done |
 | CAP-12 | P1: Capture any request faithfully | T3,T5 | Done |
-| CAP-13 | P1: Capture any request faithfully | T4,T7 | In Progress |
+| CAP-13 | P1: Capture any request faithfully | T4,T7 | Done |
 | CAP-14 | P1: Capture any request faithfully | T4 | Done |
 | CAP-15 | P1: Capture any request faithfully | T3 | Done |
 | CAP-16 | P1: Reject captures for missing bins | T2,T5 | Done |
