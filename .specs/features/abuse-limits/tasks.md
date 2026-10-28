@@ -78,10 +78,10 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Migration runs and rolls back
-- [ ] Schema field present
-- [ ] Gate check passes: `docker compose run --rm app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] Migration runs and rolls back
+- [x] Schema field present
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build

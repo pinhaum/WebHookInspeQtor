@@ -116,7 +116,7 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| LIM-01 | P1: Bounded body size | - | Pending |
+| LIM-01 | P1: Bounded body size | 1 (T1, T2) | In Progress |
 | LIM-02 | P1: Bounded body size | - | Pending |
 | LIM-03 | P1: Ring buffer per bin | - | Pending |
 | LIM-04 | P1: Ring buffer per bin | - | Pending |
