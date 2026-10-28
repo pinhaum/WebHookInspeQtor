@@ -84,20 +84,20 @@ A visitor needs a fresh, unguessable URL to point a webhook at, and a private pa
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BIN-01 | P1: Create a bin | - | Pending |
-| BIN-02 | P1: Create a bin | - | Pending |
-| BIN-03 | P1: Create a bin | - | Pending |
-| BIN-04 | P1: Create a bin | - | Pending |
-| BIN-05 | P1: Create a bin | - | Pending |
-| BIN-06 | P1: Create a bin | - | Pending |
-| BIN-07 | P1: Create a bin | - | Pending |
-| BIN-08 | P1: Private view URL | - | Pending |
-| BIN-09 | P1: Private view URL | - | Pending |
-| BIN-10 | P1: Private view URL | - | Pending |
-| BIN-11 | P1: Private view URL | - | Pending |
-| BIN-12 | P1: Private view URL | - | Pending |
+| BIN-01 | P1: Create a bin | T7 | Done |
+| BIN-02 | P1: Create a bin | T1, T2 | Done |
+| BIN-03 | P1: Create a bin | T1, T2 | Done |
+| BIN-04 | P1: Create a bin | T5 | Done |
+| BIN-05 | P1: Create a bin | T5 | Done |
+| BIN-06 | P1: Create a bin | T5 | Done |
+| BIN-07 | P1: Create a bin | T6 | Done (UAT pending) |
+| BIN-08 | P1: Private view URL | T3, T4 | Done |
+| BIN-09 | P1: Private view URL | T3, T4 | Done |
+| BIN-10 | P1: Private view URL | T3, T4 | Done |
+| BIN-11 | P1: Private view URL | T5 | Done |
+| BIN-12 | P1: Private view URL | T3, T4 | Done |
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
 
 ---
 

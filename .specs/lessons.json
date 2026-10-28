@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 3,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::when an ac starts with a user action assert the triggering control exists with its label not only the form or route it submits to",
+      "text": "When an AC starts with a user action, assert the triggering control exists with its label, not only the form or route it submits to",
+      "signal": "surviving_mutant",
+      "scope": "templates",
+      "status": "candidate",
+      "features": [
+        "bin-creation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M10 / lib/whiq_web/controllers/page_html/home.html.heex:14 (templates)"
+      ],
+      "created": "2026-10-28T13:15:54Z",
+      "last_seen": "2026-10-28T13:15:54Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::assert that a form trigger is a submit control not only a button with the right id and label",
+      "text": "Assert that a form trigger is a submit control, not only a button with the right id and label",
+      "signal": "surviving_mutant",
+      "scope": "templates",
+      "status": "candidate",
+      "features": [
+        "bin-creation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M10d / lib/whiq_web/controllers/page_html/home.html.heex:14 (templates)"
+      ],
+      "created": "2026-10-28T13:18:18Z",
+      "last_seen": "2026-10-28T13:18:18Z"
+    }
+  ]
+}

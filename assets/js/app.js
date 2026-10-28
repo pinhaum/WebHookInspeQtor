@@ -37,6 +37,12 @@ topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
+// Copy buttons dispatch whiq:copy to the input whose value they copy.
+// Clipboard access can be denied (insecure context); the input stays selectable.
+window.addEventListener("whiq:copy", e => {
+  navigator.clipboard?.writeText(e.target.value).catch(() => {})
+})
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 

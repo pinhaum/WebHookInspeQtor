@@ -15,6 +15,8 @@ defmodule WhiqWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    post "/bins", BinController, :create
+    live "/bins/:token", BinLive
   end
 
   # No pipeline: captures must reach the controller exactly as sent (AD-001).
