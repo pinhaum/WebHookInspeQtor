@@ -400,11 +400,11 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Capture blocked on the bin lock, bin deleted and committed → status line `HTTP/1.1 404 Not Found`, no stored row
-- [ ] The test waits for a lock-waiting backend before deleting, not a sleep
-- [ ] Mutation 404 → 200 on `{:error, :not_found}` from `capture_request/2` fails the test
-- [ ] Gate check passes: `docker compose run --rm app mix test test/whiq_web/capture_lock_race_test.exs`
-- [ ] Test count: previous + new tests pass
+- [x] Capture blocked on the bin lock, bin deleted and committed → status line `HTTP/1.1 404 Not Found`, no stored row
+- [x] The test waits for a lock-waiting backend before deleting, not a sleep
+- [x] Mutation 404 → 200 on `{:error, :not_found}` from `capture_request/2` fails the test
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web/capture_lock_race_test.exs`
+- [x] Test count: previous + new tests pass
 
 **Tests**: integration
 **Gate**: quick
