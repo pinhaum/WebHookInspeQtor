@@ -39,4 +39,36 @@ defmodule WhiqWeb.BinLiveTest do
       assert_error_sent 404, fn -> get(conn, ~p"/bins/#{String.duplicate("a", 31) <> "."}") end
     end
   end
+
+  describe "bin page" do
+    setup %{conn: conn, bin: bin} do
+      {:ok, view, _html} = live(conn, ~p"/bins/#{bin.view_token}")
+      %{view: view, document: view |> render() |> LazyHTML.from_fragment()}
+    end
+
+    test "BIN-04: shows the absolute capture url", %{document: document, bin: bin} do
+      capture_url = WhiqWeb.Endpoint.url() <> "/h/" <> bin.capture_token
+
+      assert document |> LazyHTML.query("#capture-url") |> LazyHTML.attribute("value") ==
+               [capture_url]
+    end
+
+    test "BIN-05: shows the expiry as an ISO 8601 UTC timestamp", %{document: document, bin: bin} do
+      assert document |> LazyHTML.query("#expires-at") |> LazyHTML.text() |> String.trim() ==
+               DateTime.to_iso8601(bin.expires_at)
+    end
+
+    test "BIN-06: shows the save-url notice", %{document: document} do
+      assert document |> LazyHTML.query("#save-url-notice") |> LazyHTML.text() |> String.trim() ==
+               "Save this page's URL: it is the only way back to this bin."
+    end
+
+    # Deliberate raw-HTML check: BIN-11 is about a string being absent (design.md Risks).
+    test "BIN-11: never renders the view token", %{conn: conn, view: view, bin: bin} do
+      dead_html = conn |> get(~p"/bins/#{bin.view_token}") |> html_response(200)
+
+      refute dead_html =~ bin.view_token
+      refute render(view) =~ bin.view_token
+    end
+  end
 end

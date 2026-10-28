@@ -199,16 +199,18 @@ T7 → T8
 
 **Done when**:
 
-- [ ] `test/whiq_web/live/bin_live_test.exs`:
+- [x] `test/whiq_web/live/bin_live_test.exs`:
   - BIN-04: `#capture-url` value equals `WhiqWeb.Endpoint.url() <> "/h/" <> capture_token`
   - BIN-05: `#expires-at` text equals `DateTime.to_iso8601(bin.expires_at)`
   - BIN-06: `#save-url-notice` text equals "Save this page's URL: it is the only way back to this bin."
   - BIN-11: neither the dead render (`html_response`) nor the connected render (`render(view)`) contains `view_token` (deliberate raw-HTML refute, design.md Risks)
-- [ ] Gate check passes: `docker compose run --rm app mix test`
-- [ ] Test count: 24 + 4 tests pass
+- [x] Gate check passes: `docker compose run --rm app mix test`
+- [x] Test count: 24 + 4 tests pass
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
 
 **Commit**: `feat(bins): show capture url, expiry and save notice`
 
