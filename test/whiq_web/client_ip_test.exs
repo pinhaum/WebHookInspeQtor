@@ -35,6 +35,20 @@ defmodule WhiqWeb.ClientIPTest do
     assert ClientIP.from_conn(conn) == "198.51.100.9"
   end
 
+  test "a configured header with bytes that are not UTF-8 falls back to the peer address" do
+    conn = put_req_header(peer_conn(), "fly-client-ip", <<0xFF, ?1>>)
+
+    assert ClientIP.from_conn(conn) == "198.51.100.9"
+  end
+
+  test "a configured header with a valid IP is returned in canonical form" do
+    upper = put_req_header(peer_conn(), "fly-client-ip", "2001:DB8:0:0::1")
+    lower = put_req_header(peer_conn(), "fly-client-ip", "2001:db8::1")
+
+    assert ClientIP.from_conn(upper) == "2001:db8::1"
+    assert ClientIP.from_conn(lower) == "2001:db8::1"
+  end
+
   test "a configured header that is absent falls back to the peer address" do
     assert ClientIP.from_conn(peer_conn()) == "198.51.100.9"
   end

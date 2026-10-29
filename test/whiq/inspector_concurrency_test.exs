@@ -15,6 +15,13 @@ defmodule Whiq.InspectorConcurrencyTest do
 
   @parallel 20
 
+  setup_all do
+    assert Repo.config()[:pool_size] > @parallel,
+           "LIM-04 needs pool_size > #{@parallel} (config/test.exs)"
+
+    :ok
+  end
+
   setup do
     :ok = Sandbox.mode(Repo, :auto)
     {:ok, bin} = Inspector.create_bin()
