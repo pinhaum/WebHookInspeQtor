@@ -19,4 +19,8 @@ defmodule Whiq.ObanConfigTest do
     assert {Oban.Cron, opts} = List.keyfind(production_plugins(), Oban.Cron, 0)
     assert {"@hourly", Whiq.Inspector.PruneExpiredBins} in Keyword.fetch!(opts, :crontab)
   end
+
+  test "the application supervises Oban on the app repo (RET-04, RET-07)" do
+    assert %Oban.Config{repo: Whiq.Repo} = Oban.config()
+  end
 end
