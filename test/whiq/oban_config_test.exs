@@ -14,4 +14,9 @@ defmodule Whiq.ObanConfigTest do
     assert {Oban.Pruner, opts} = List.keyfind(production_plugins(), Oban.Pruner, 0)
     assert Keyword.fetch!(opts, :max_age) == {7, :days}
   end
+
+  test "schedules the expired bin prune hourly (RET-04)" do
+    assert {Oban.Cron, opts} = List.keyfind(production_plugins(), Oban.Cron, 0)
+    assert {"@hourly", Whiq.Inspector.PruneExpiredBins} in Keyword.fetch!(opts, :crontab)
+  end
 end

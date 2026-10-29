@@ -29,6 +29,16 @@ defmodule Whiq.Inspector do
   end
 
   @doc """
+  Deletes every bin whose `expires_at` is at or before `now`, with its
+  captured requests (cascade), and returns how many bins were deleted.
+  A bin is live exactly while `expires_at > now`, as in the lookups below.
+  """
+  def delete_expired_bins(now \\ DateTime.utc_now(:second)) do
+    {count, _} = Repo.delete_all(from(b in Bin, where: b.expires_at <= ^now))
+    count
+  end
+
+  @doc """
   Fetches an unexpired bin by its view token. A token outside the token
   format is rejected before any query runs.
   """

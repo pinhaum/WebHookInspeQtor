@@ -69,15 +69,15 @@ Bins expire 7 days after creation, but expiry only matters if expired data is ac
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| RET-01 | P1: Prune expired bins | - | Pending |
-| RET-02 | P1: Prune expired bins | - | Pending |
-| RET-03 | P1: Prune expired bins | - | Pending |
-| RET-04 | P1: Prune expired bins | - | Pending |
-| RET-05 | P1: Prune expired bins | - | Pending |
-| RET-06 | P1: Prune expired bins | - | Pending |
+| RET-01 | P1: Prune expired bins | Execute | Implementing |
+| RET-02 | P1: Prune expired bins | Execute | Implementing |
+| RET-03 | P1: Prune expired bins | Execute | Implementing |
+| RET-04 | P1: Prune expired bins | Execute | Implementing |
+| RET-05 | P1: Prune expired bins | Execute | Implementing |
+| RET-06 | P1: Prune expired bins | Execute | Implementing |
 | RET-07 | P1: Prune expired bins | Execute | Implementing |
 
-**Coverage:** 7 total, 0 mapped to tasks, 7 unmapped ⚠️
+**Coverage:** 7 total, 7 implemented (inline plan, no tasks.md)
 
 ---
 

@@ -432,4 +432,46 @@ defmodule Whiq.InspectorTest do
       assert Inspector.fetch_request(bin, foreign.id) == {:error, :not_found}
     end
   end
+
+  describe "delete_expired_bins/1" do
+    defp expire!(bin, expires_at) do
+      Repo.update_all(from(b in Bin, where: b.id == ^bin.id), set: [expires_at: expires_at])
+    end
+
+    test "RET-01, RET-03: deletes bins expiring at or before now and keeps later ones" do
+      now = DateTime.utc_now(:second)
+      {:ok, past} = Inspector.create_bin()
+      {:ok, at_now} = Inspector.create_bin()
+      {:ok, later} = Inspector.create_bin()
+      expire!(past, DateTime.add(now, -1, :second))
+      expire!(at_now, now)
+      expire!(later, DateTime.add(now, 1, :second))
+
+      assert Inspector.delete_expired_bins(now) == 2
+
+      assert Repo.all(from(b in Bin, select: b.id)) == [later.id]
+    end
+
+    test "RET-02: deletes the captured requests of deleted bins only" do
+      now = DateTime.utc_now(:second)
+      {:ok, expired} = Inspector.create_bin()
+      {:ok, live} = Inspector.create_bin()
+      capture!(expired, snapshot())
+      capture!(expired, snapshot())
+      kept = capture!(live, snapshot())
+      expire!(expired, now)
+
+      assert Inspector.delete_expired_bins(now) == 1
+
+      assert Repo.all(from(r in CapturedRequest, select: r.id)) == [kept.id]
+    end
+
+    test "RET-05: deletes nothing when no bin has expired" do
+      {:ok, live} = Inspector.create_bin()
+
+      assert Inspector.delete_expired_bins() == 0
+
+      assert Repo.all(from(b in Bin, select: b.id)) == [live.id]
+    end
+  end
 end

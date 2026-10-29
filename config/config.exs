@@ -18,11 +18,13 @@ config :whiq, :max_requests_per_bin, 100
 config :whiq, :capture_rate_limit, limit: 60, scale_ms: 60_000
 config :whiq, :bin_rate_limit, limit: 10, scale_ms: 3_600_000
 
-# Background jobs. Finished job rows are kept a week for debugging (RET-07).
+# Background jobs: expired bins are pruned hourly (AD-006); finished job rows
+# are kept a week for debugging (RET-07).
 config :whiq, Oban,
   repo: Whiq.Repo,
   queues: [default: 5],
-  pruner: [max_age: {7, :days}]
+  pruner: [max_age: {7, :days}],
+  cron: [crontab: [{"@hourly", Whiq.Inspector.PruneExpiredBins}]]
 
 # Configure the endpoint
 config :whiq, WhiqWeb.Endpoint,
