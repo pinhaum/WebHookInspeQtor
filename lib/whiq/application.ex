@@ -10,6 +10,7 @@ defmodule Whiq.Application do
     children = [
       WhiqWeb.Telemetry,
       Whiq.Repo,
+      {Oban, Application.fetch_env!(:whiq, Oban)},
       {DNSCluster, query: Application.get_env(:whiq, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Whiq.PubSub},
       {Whiq.RateLimit, clean_period: :timer.minutes(1)},

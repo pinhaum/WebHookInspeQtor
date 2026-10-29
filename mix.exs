@@ -73,7 +73,8 @@ defmodule Whiq.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:hammer, "== 7.5.0"}
+      {:hammer, "== 7.5.0"},
+      {:oban, "~> 2.24"}
     ]
   end
 
