@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 10,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,78 @@
       ],
       "created": "2026-10-28T17:39:31Z",
       "last_seen": "2026-10-28T17:39:31Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::when a limit is keyed on the client ip test it with the proxy header configured and a shared peer address so keying on the raw peer address fails",
+      "text": "When a limit is keyed on the client IP, test it with the proxy header configured and a shared peer address, so keying on the raw peer address fails",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "abuse-limits"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M13 / lib/whiq_web/controllers/bin_controller.ex:11 (LIM-10) (routes)"
+      ],
+      "created": "2026-10-28T20:44:50Z",
+      "last_seen": "2026-10-28T20:44:50Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::give every error branch a controller maps from the domain an http level test not only a domain level one",
+      "text": "Give every error branch a controller maps from the domain an HTTP-level test, not only a domain-level one",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "abuse-limits"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M18 / lib/whiq_web/controllers/capture_controller.ex:17 (routes)"
+      ],
+      "created": "2026-10-28T20:44:50Z",
+      "last_seen": "2026-10-28T20:44:50Z"
+    },
+    {
+      "id": "L-008",
+      "key": "surviving_mutant::when a cap shrinks a read below the adapter s chunk size keep a test with an adapter that returns short chunks so the accumulation loop stays exercised",
+      "text": "When a cap shrinks a read below the adapter's chunk size, keep a test with an adapter that returns short chunks so the accumulation loop stays exercised",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "abuse-limits"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M16, M17 / lib/whiq_web/capture_snapshot.ex:44-45 (routes)"
+      ],
+      "created": "2026-10-28T20:44:50Z",
+      "last_seen": "2026-10-28T20:44:50Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_precision_gap::define client ip in the spec wherever an ac keys on it including the proxy header rule",
+      "text": "Define client IP in the spec wherever an AC keys on it, including the proxy header rule",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "abuse-limits"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md SP-1 (LIM-09, LIM-10) (spec)"
+      ],
+      "created": "2026-10-28T20:44:50Z",
+      "last_seen": "2026-10-28T20:44:50Z"
     }
   ]
 }

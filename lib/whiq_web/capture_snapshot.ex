@@ -5,13 +5,19 @@ defmodule WhiqWeb.CaptureSnapshot do
   decoded or reordered.
   """
 
+  alias WhiqWeb.ClientIP
+
   @default_read_timeout 15_000
 
   @doc """
-  Drains the request body and returns the snapshot with the updated conn.
+  Reads the request body up to one byte past the `:max_body_bytes` config
+  and returns the snapshot with the updated conn. The remainder is left
+  unread; the extra byte lets `Whiq.Inspector` tell a body at the cap from
+  one over it (LIM-01, LIM-02).
   """
   def from_conn(%Plug.Conn{} = conn) do
-    {body, conn} = read_full_body(conn, [])
+    limit = Application.fetch_env!(:whiq, :max_body_bytes) + 1
+    {body, conn} = read_bounded_body(conn, [], 0, limit)
 
     snapshot = %{
       method: conn.method,
@@ -19,19 +25,31 @@ defmodule WhiqWeb.CaptureSnapshot do
       query_string: conn.query_string,
       headers: conn.req_headers,
       body: body,
-      remote_ip: remote_ip(conn)
+      remote_ip: ClientIP.from_conn(conn)
     }
 
     {snapshot, conn}
   end
 
-  defp read_full_body(conn, acc) do
+  defp read_bounded_body(conn, acc, size, limit) do
     read_timeout = Application.get_env(:whiq, :capture_read_timeout, @default_read_timeout)
 
-    case Plug.Conn.read_body(conn, read_timeout: read_timeout) do
-      {:ok, chunk, conn} -> {IO.iodata_to_binary([acc, chunk]), conn}
-      {:more, chunk, conn} -> read_full_body(conn, [acc, chunk])
+    case Plug.Conn.read_body(conn, length: limit - size, read_timeout: read_timeout) do
+      {:ok, chunk, conn} ->
+        {cap([acc, chunk], limit), conn}
+
+      {:more, chunk, conn} when size + byte_size(chunk) >= limit ->
+        {cap([acc, chunk], limit), conn}
+
+      {:more, chunk, conn} ->
+        read_bounded_body(conn, [acc, chunk], size + byte_size(chunk), limit)
     end
+  end
+
+  # An adapter may return more than :length asks for.
+  defp cap(iodata, limit) do
+    body = IO.iodata_to_binary(iodata)
+    binary_part(body, 0, min(byte_size(body), limit))
   end
 
   # request_path is what was sent; path_params["path"] would be percent-decoded.
@@ -39,16 +57,6 @@ defmodule WhiqWeb.CaptureSnapshot do
     case String.split(token_and_path, "/", parts: 2) do
       [_token] -> "/"
       [_token, path] -> "/" <> path
-    end
-  end
-
-  defp remote_ip(conn) do
-    with header when is_binary(header) <- Application.get_env(:whiq, :client_ip_header),
-         [value | _] <- Plug.Conn.get_req_header(conn, header),
-         {:ok, _ip} <- :inet.parse_strict_address(String.to_charlist(value)) do
-      value
-    else
-      _ -> conn.remote_ip |> :inet.ntoa() |> to_string()
     end
   end
 end

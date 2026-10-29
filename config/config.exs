@@ -11,6 +11,13 @@ config :whiq,
   ecto_repos: [Whiq.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+# Abuse limits (AD-007): bytes stored per body, requests kept per bin.
+config :whiq, :max_body_bytes, 524_288
+config :whiq, :max_requests_per_bin, 100
+# Fixed-window rate limits: captures per bin, bin creation per client IP.
+config :whiq, :capture_rate_limit, limit: 60, scale_ms: 60_000
+config :whiq, :bin_rate_limit, limit: 10, scale_ms: 3_600_000
+
 # Configure the endpoint
 config :whiq, WhiqWeb.Endpoint,
   url: [host: "localhost"],

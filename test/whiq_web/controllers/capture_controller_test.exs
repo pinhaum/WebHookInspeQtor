@@ -155,6 +155,109 @@ defmodule WhiqWeb.CaptureControllerTest do
     assert stored.content_type == "text/plain; charset=utf-8"
   end
 
+  describe "body size cap" do
+    test "LIM-01: a 524,289-byte body is answered 200 and stored truncated to 524,288 bytes",
+         %{conn: conn, bin: bin} do
+      body = :crypto.strong_rand_bytes(524_289)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/octet-stream")
+        |> post("/h/#{bin.capture_token}", body)
+
+      assert response(conn, 200) == ""
+      stored = stored_request(bin)
+      assert stored.body == binary_part(body, 0, 524_288)
+      assert stored.body_size == 524_288
+      assert stored.body_truncated == true
+    end
+
+    test "LIM-02: a 524,288-byte body is answered 200 and stored whole",
+         %{conn: conn, bin: bin} do
+      body = :crypto.strong_rand_bytes(524_288)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/octet-stream")
+        |> post("/h/#{bin.capture_token}", body)
+
+      assert response(conn, 200) == ""
+      stored = stored_request(bin)
+      assert stored.body == body
+      assert stored.body_truncated == false
+    end
+  end
+
+  # config/test.exs allows 2 captures per bin per hour; each test uses a fresh bin,
+  # so counters never leak between tests.
+  describe "capture rate limit" do
+    defp capture(bin) do
+      build_conn()
+      |> put_req_header("content-type", "text/plain")
+      |> post("/h/#{bin.capture_token}", "x")
+    end
+
+    defp stored_ids(bin) do
+      Repo.all(
+        from r in CapturedRequest, where: r.bin_id == ^bin.id, select: r.id, order_by: r.id
+      )
+    end
+
+    defp fill!(bin, count) do
+      snapshot = %{
+        method: "POST",
+        path: "/",
+        query_string: "",
+        headers: [],
+        body: "",
+        remote_ip: "203.0.113.7"
+      }
+
+      for _ <- 1..count, do: {:ok, _} = Inspector.capture_request(bin, snapshot)
+    end
+
+    test "LIM-06: captures up to the limit are answered 200", %{bin: bin} do
+      assert response(capture(bin), 200) == ""
+      assert response(capture(bin), 200) == ""
+      assert length(stored_ids(bin)) == 2
+    end
+
+    test "LIM-06: the capture over the limit is answered 429 with retry-after and not stored",
+         %{bin: bin} do
+      capture(bin)
+      capture(bin)
+
+      conn = capture(bin)
+
+      assert response(conn, 429) == ""
+      assert [retry_after] = get_resp_header(conn, "retry-after")
+      assert {seconds, ""} = Integer.parse(retry_after)
+      assert seconds >= 1
+      assert length(stored_ids(bin)) == 2
+    end
+
+    test "LIM-12: a rate-limited capture into a full bin evicts nothing", %{bin: bin} do
+      fill!(bin, 98)
+      capture(bin)
+      capture(bin)
+      full_ids = stored_ids(bin)
+      assert length(full_ids) == 100
+
+      assert capture(bin).status == 429
+      assert stored_ids(bin) == full_ids
+    end
+
+    test "LIM-08: another bin keeps accepting captures while one is limited", %{bin: bin} do
+      {:ok, other} = Inspector.create_bin()
+      capture(bin)
+      capture(bin)
+      assert capture(bin).status == 429
+
+      assert response(capture(other), 200) == ""
+      assert length(stored_ids(other)) == 1
+    end
+  end
+
   describe "requests that store nothing" do
     test "CAP-16: an unknown capture token is answered 404", %{conn: conn} do
       conn =

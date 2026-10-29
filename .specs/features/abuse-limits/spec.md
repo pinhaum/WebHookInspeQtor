@@ -100,6 +100,8 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 1. IF a client IP requests an 11th bin within the same hour THEN the system SHALL create no bin and show "Too many bins created. Try again later." (LIM-09)
 2. WHILE one IP is limited the system SHALL keep allowing bin creation from other IPs (LIM-10)
 
+"Client IP" in LIM-09 and LIM-10 is the address resolved per design.md (`WhiqWeb.ClientIP`): the configured proxy header (`fly-client-ip` in prod) when it holds a valid IP, otherwise the peer address.
+
 **Independent Test**: With a test limit of 1/window, the second click from the same IP shows the message.
 
 ---
@@ -116,23 +118,23 @@ A public endpoint that stores whatever it receives is an invitation to fill the 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| LIM-01 | P1: Bounded body size | - | Pending |
-| LIM-02 | P1: Bounded body size | - | Pending |
-| LIM-03 | P1: Ring buffer per bin | - | Pending |
-| LIM-04 | P1: Ring buffer per bin | - | Pending |
-| LIM-05 | P1: Ring buffer per bin | - | Pending |
-| LIM-06 | P1: Capture rate limit | - | Pending |
-| LIM-07 | P1: Capture rate limit | - | Pending |
-| LIM-08 | P1: Capture rate limit | - | Pending |
-| LIM-09 | P1: Bin creation rate limit | - | Pending |
-| LIM-10 | P1: Bin creation rate limit | - | Pending |
-| LIM-11 | P1: Ring buffer per bin | - | Pending |
-| LIM-12 | P1: Capture rate limit | - | Pending |
-| LIVE-04 | P1: Ring buffer per bin (moved from live-inspection) | - | Pending |
-| LIVE-10 | P1: Bounded body size (moved from live-inspection) | - | Pending |
-| LIVE-14 | P1: Ring buffer per bin (moved from live-inspection) | - | Pending |
+| LIM-01 | P1: Bounded body size | T1,T2,T6 | Done |
+| LIM-02 | P1: Bounded body size | T2,T6 | Done |
+| LIM-03 | P1: Ring buffer per bin | T3 | Done |
+| LIM-04 | P1: Ring buffer per bin | T3 | Done |
+| LIM-05 | P1: Ring buffer per bin | T3 | Done |
+| LIM-06 | P1: Capture rate limit | T7 | Done |
+| LIM-07 | P1: Capture rate limit | T4 | Done |
+| LIM-08 | P1: Capture rate limit | T7 | Done |
+| LIM-09 | P1: Bin creation rate limit | T8,T11 | Done |
+| LIM-10 | P1: Bin creation rate limit | T5,T8,T11 | Done |
+| LIM-11 | P1: Ring buffer per bin | T2,T3 | Done |
+| LIM-12 | P1: Capture rate limit | T7 | Done |
+| LIVE-04 | P1: Ring buffer per bin (moved from live-inspection) | T9 | Done |
+| LIVE-10 | P1: Bounded body size (moved from live-inspection) | T10 | Done |
+| LIVE-14 | P1: Ring buffer per bin (moved from live-inspection) | T9 | Done |
 
-**Coverage:** 15 total, 0 mapped to tasks, 15 unmapped ⚠️
+**Coverage:** 15 total, 15 mapped to tasks, 0 unmapped
 
 ---
 

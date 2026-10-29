@@ -50,8 +50,17 @@ defmodule Whiq.Inspector do
   and are stored flattened (AD-008). `body_size` and `content_type` are
   derived here so they always agree with the stored bytes.
 
-  Once stored, the request is broadcast as `{:request_captured, request}`
-  to the bin's subscribers (see `subscribe/1`).
+  A body longer than the `:max_body_bytes` config is stored cut to that
+  many bytes with `body_truncated` set (AD-007).
+
+  The bin keeps at most `:max_requests_per_bin` requests: the insert and the
+  eviction of the oldest ones run in one transaction holding the bin row
+  lock, so concurrent captures never exceed the cap. A bin deleted before
+  the lock is taken returns `{:error, :not_found}`.
+
+  After commit, the request is broadcast as `{:request_captured, request}`,
+  then each evicted id as `{:request_evicted, id}`, to the bin's subscribers
+  (see `subscribe/1`).
   """
   def capture_request(%Bin{} = bin, %{
         method: method,
@@ -61,21 +70,60 @@ defmodule Whiq.Inspector do
         body: body,
         remote_ip: remote_ip
       }) do
-    with {:ok, request} <-
-           Repo.insert(%CapturedRequest{
-             bin_id: bin.id,
-             method: method,
-             path: path,
-             query_string: query_string,
-             headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
-             body: body,
-             body_size: byte_size(body),
-             content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
-             remote_ip: remote_ip
-           }) do
+    max_body_bytes = Application.fetch_env!(:whiq, :max_body_bytes)
+    stored_body = binary_part(body, 0, min(byte_size(body), max_body_bytes))
+
+    request = %CapturedRequest{
+      bin_id: bin.id,
+      method: method,
+      path: path,
+      query_string: query_string,
+      headers: Enum.flat_map(headers, fn {name, value} -> [name, value] end),
+      body: stored_body,
+      body_size: byte_size(stored_body),
+      body_truncated: byte_size(body) > max_body_bytes,
+      content_type: List.keyfind(headers, "content-type", 0, {nil, nil}) |> elem(1),
+      remote_ip: remote_ip
+    }
+
+    with {:ok, {request, evicted_ids}} <- insert_and_evict(bin, request) do
       Phoenix.PubSub.broadcast(Whiq.PubSub, topic(bin), {:request_captured, request})
+
+      Enum.each(evicted_ids, fn id ->
+        Phoenix.PubSub.broadcast(Whiq.PubSub, topic(bin), {:request_evicted, id})
+      end)
+
       {:ok, request}
     end
+  end
+
+  defp insert_and_evict(%Bin{id: bin_id}, request) do
+    max_requests = Application.fetch_env!(:whiq, :max_requests_per_bin)
+
+    Repo.transact(fn ->
+      locked = Repo.one(from(b in Bin, where: b.id == ^bin_id, select: b.id, lock: "FOR UPDATE"))
+
+      if locked do
+        request = Repo.insert!(request)
+
+        beyond_cap =
+          from(r in CapturedRequest,
+            where: r.bin_id == ^bin_id,
+            order_by: [desc: r.inserted_at, desc: r.id],
+            offset: ^max_requests,
+            select: r.id
+          )
+
+        {_count, evicted_ids} =
+          Repo.delete_all(
+            from(r in CapturedRequest, where: r.id in subquery(beyond_cap), select: r.id)
+          )
+
+        {:ok, {request, evicted_ids}}
+      else
+        {:error, :not_found}
+      end
+    end)
   end
 
   @doc """

@@ -52,6 +52,31 @@ defmodule WhiqWeb.BinLive do
      |> stream_insert(:requests, request, at: 0)}
   end
 
+  # Captures broadcast before evictions, so when the selection is evicted the
+  # newest remaining request is already on the page (LIVE-14).
+  def handle_info({:request_evicted, id}, socket) do
+    socket =
+      socket
+      |> stream_delete_by_dom_id(:requests, "requests-#{id}")
+      |> update(:request_count, &(&1 - 1))
+
+    selected = socket.assigns.selected
+
+    if selected && selected.id == id do
+      bin = socket.assigns.bin
+
+      case newest(bin, Inspector.list_requests(bin)) do
+        nil ->
+          {:noreply, assign(socket, :selected, nil)}
+
+        request ->
+          {:noreply, socket |> assign(:selected, request) |> stream_insert(:requests, request)}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
   # The id comes from the client: anything that is not one of this bin's
   # request ids leaves the page unchanged.
   @impl true
@@ -198,6 +223,15 @@ defmodule WhiqWeb.BinLive do
 
             <div class="space-y-1">
               <h3 class="text-sm font-semibold">Body</h3>
+              <p
+                :if={@selected.body_truncated}
+                id="body-truncated"
+                role="note"
+                class="alert alert-warning text-sm"
+              >
+                <.icon name="hero-scissors" class="size-5 shrink-0" />
+                Body truncated: showing the first {@selected.body_size} bytes
+              </p>
               <%= case ByteFormat.body(@selected.body) do %>
                 <% :empty -> %>
                   <p id="request-body" data-format="empty" class="text-sm opacity-70">

@@ -65,6 +65,29 @@ defmodule WhiqWeb.CaptureServerTest do
     assert [%CapturedRequest{method: "propfind"}] = stored_requests(bin)
   end
 
+  # The handler answers before the sender finishes, leaving most of the body unread.
+  test "LIM-01: a 1 MB body is answered 200 and stored truncated to 524,288 bytes",
+       %{bin: bin, socket: socket} do
+    body = :crypto.strong_rand_bytes(1_048_576)
+
+    :ok =
+      :gen_tcp.send(
+        socket,
+        "POST /h/#{bin.capture_token} HTTP/1.1\r\nhost: localhost\r\n" <>
+          "content-type: application/octet-stream\r\ncontent-length: #{byte_size(body)}\r\n\r\n"
+      )
+
+    sender = Task.async(fn -> :gen_tcp.send(socket, body) end)
+
+    assert status_line(socket) == "HTTP/1.1 200 OK\r\n"
+    Task.await(sender)
+
+    assert [%CapturedRequest{} = stored] = stored_requests(bin)
+    assert stored.body == binary_part(body, 0, 524_288)
+    assert stored.body_size == 524_288
+    assert stored.body_truncated == true
+  end
+
   test "CAP-19: a body that stalls past the read timeout is answered 408 and not stored",
        %{bin: bin, socket: socket} do
     :ok =

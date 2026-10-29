@@ -237,6 +237,28 @@ defmodule Whiq.InspectorTest do
       assert Repo.aggregate(CapturedRequest, :count) == 0
     end
 
+    test "LIM-01: a body over 524,288 bytes is stored cut to its first 524,288 bytes" do
+      {:ok, bin} = Inspector.create_bin()
+      body = :crypto.strong_rand_bytes(524_289)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == binary_part(body, 0, 524_288)
+      assert stored.body_truncated == true
+      assert stored.body_size == 524_288
+    end
+
+    test "LIM-02: a body of exactly 524,288 bytes is stored whole and not truncated" do
+      {:ok, bin} = Inspector.create_bin()
+      body = :crypto.strong_rand_bytes(524_288)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == body
+      assert stored.body_truncated == false
+      assert stored.body_size == 524_288
+    end
+
     test "CAP-21: an empty body is stored as an empty binary with body_size 0" do
       {:ok, bin} = Inspector.create_bin()
 
@@ -244,6 +266,91 @@ defmodule Whiq.InspectorTest do
 
       assert stored.body == ""
       assert stored.body_size == 0
+    end
+  end
+
+  describe "capture_request/2 ring buffer" do
+    defp fill!(bin, count) do
+      for _ <- 1..count do
+        {:ok, %CapturedRequest{id: id}} = Inspector.capture_request(bin, snapshot())
+        id
+      end
+    end
+
+    defp stored_ids(bin) do
+      CapturedRequest
+      |> where([r], r.bin_id == ^bin.id)
+      |> select([r], r.id)
+      |> Repo.all()
+      |> Enum.sort()
+    end
+
+    test "LIM-03: a capture into a bin holding 100 requests evicts the oldest one" do
+      {:ok, bin} = Inspector.create_bin()
+      [oldest_id | kept_ids] = fill!(bin, 100)
+
+      {:ok, %CapturedRequest{id: new_id}} = Inspector.capture_request(bin, snapshot())
+
+      assert stored_ids(bin) == Enum.sort(kept_ids ++ [new_id])
+      refute oldest_id in stored_ids(bin)
+    end
+
+    test "LIM-03: a capture into a bin holding 99 requests evicts nothing" do
+      {:ok, bin} = Inspector.create_bin()
+      ids = fill!(bin, 99)
+      :ok = Inspector.subscribe(bin)
+
+      {:ok, %CapturedRequest{id: new_id}} = Inspector.capture_request(bin, snapshot())
+
+      assert stored_ids(bin) == Enum.sort(ids ++ [new_id])
+      refute_received {:request_evicted, _}
+    end
+
+    test "LIM-03: eviction only removes requests of the captured bin" do
+      {:ok, bin} = Inspector.create_bin()
+      {:ok, other} = Inspector.create_bin()
+      other_ids = fill!(other, 1)
+      fill!(bin, 100)
+
+      {:ok, _request} = Inspector.capture_request(bin, snapshot())
+
+      assert stored_ids(other) == other_ids
+    end
+
+    test "LIM-05: the eviction is broadcast after the capture, with the evicted id" do
+      {:ok, bin} = Inspector.create_bin()
+      [oldest_id | _] = fill!(bin, 100)
+      :ok = Inspector.subscribe(bin)
+
+      {:ok, %CapturedRequest{id: new_id}} = Inspector.capture_request(bin, snapshot())
+
+      assert {:messages, [{:request_captured, %CapturedRequest{id: ^new_id}}, evicted]} =
+               Process.info(self(), :messages)
+
+      assert evicted == {:request_evicted, oldest_id}
+    end
+
+    test "LIM-11: a truncated capture into a full bin is stored truncated and evicts the oldest" do
+      {:ok, bin} = Inspector.create_bin()
+      [oldest_id | _] = fill!(bin, 100)
+      body = :crypto.strong_rand_bytes(524_289)
+
+      stored = capture!(bin, snapshot(%{body: body}))
+
+      assert stored.body == binary_part(body, 0, 524_288)
+      assert stored.body_truncated == true
+      assert length(stored_ids(bin)) == 100
+      refute oldest_id in stored_ids(bin)
+    end
+
+    test "a bin deleted before the capture is not found and stores nothing" do
+      {:ok, bin} = Inspector.create_bin()
+      Repo.delete!(bin)
+      :ok = Inspector.subscribe(bin)
+
+      assert Inspector.capture_request(bin, snapshot()) == {:error, :not_found}
+      assert stored_ids(bin) == []
+      refute_received {:request_captured, _}
     end
   end
 

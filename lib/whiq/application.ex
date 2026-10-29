@@ -12,6 +12,7 @@ defmodule Whiq.Application do
       Whiq.Repo,
       {DNSCluster, query: Application.get_env(:whiq, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Whiq.PubSub},
+      {Whiq.RateLimit, clean_period: :timer.minutes(1)},
       # Start a worker by calling: Whiq.Worker.start_link(arg)
       # {Whiq.Worker, arg},
       # Start to serve requests, typically the last entry

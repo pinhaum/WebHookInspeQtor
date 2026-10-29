@@ -14,6 +14,7 @@ defmodule Whiq.Inspector.CapturedRequest do
     field :headers, {:array, :binary}
     field :body, :binary
     field :body_size, :integer
+    field :body_truncated, :boolean, default: false
     field :content_type, :binary
     field :remote_ip, :string
 
