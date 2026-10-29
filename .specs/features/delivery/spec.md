@@ -15,7 +15,8 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | Feature | Reason |
 | ------- | ------ |
 | Automatic deploy from CI | Deploys are manual; no deploy credentials in CI for a portfolio repo |
-| Multi-region or clustering | Single machine is enough; rate limiter is per node |
+| Multi-region or clustering | Single machine is enough; rate limiter, PubSub and Oban cron assume one live node |
+| Managed database (backups, HA) | Bin data is ephemeral (7 days); legacy Fly Postgres is enough |
 | Monitoring beyond Fly's built-in metrics | Scope |
 
 ---
@@ -24,14 +25,19 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Host | Fly.io with Fly Postgres | User choice | y |
+| Host | Fly.io app + legacy (unmanaged) Fly Postgres created with `fly postgres create`, attached over the private network | User choice; cheapest Fly option, no managed backups needed for 7-day data | y |
+| Topology | Exactly one app machine, always on: `min_machines_running = 1`, auto-stop disabled | Hammer ETS limiter and Phoenix PubSub are per node, and the hourly retention cron only runs while a node is up | y |
 | Release image | `mix phx.gen.release --docker` output | Official generator | y |
 | Migrations | Fly `release_command` runs the release migrate script | Runs before new machines take traffic | y |
 | HTTPS | Fly proxy forces HTTPS; plain-HTTP captures get redirected and are not stored | Senders almost always use HTTPS; avoids storing secrets sent in clear | y |
 | LiveDashboard in prod | Not exposed | It sits behind `dev_routes` in the generated router | y |
 | CI | GitHub Actions with a Postgres service container | Repository host | y |
 | CI checks | `mix format --check-formatted`, `mix compile --warnings-as-errors`, `mix deps.unlock --check-unused`, `mix test` | Same as `mix precommit`, but non-mutating | y |
+| CI image build | A separate CI job builds the release Docker image without pushing it | Catches Dockerfile and asset breakage before a manual `fly deploy` | y |
 | README language | English | User choice | y |
+| Failed `release_command` (formerly DEL-10) | Documented as Fly behavior in the README: a failing migration aborts the deploy and the previous release keeps serving; not tested | Testing it means deploying a broken migration to production on purpose | y |
+| Client IP in prod (DEL-06) | Already implemented by `WhiqWeb.ClientIP` and `config/runtime.exs`; delivery only verifies it live | Shipped with request-capture (commit `5f3f696`) | y |
+| Health check vs `force_ssl` | Fly's HTTP health check must not be redirected; the exact mechanism (excluded path or forwarded-proto header) is a Design choice | `force_ssl` in `config/prod.exs` redirects any request without `x-forwarded-proto: https` | n |
 | DEL-07 failure | Switch client IP resolution to `x-forwarded-for` parsed from the right with `remote_ip`, as a fix task | Plan B agreed before deploy (see `request-capture` assumptions) | y |
 
 **Open questions:** none - all resolved or logged above.
@@ -50,6 +56,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 
 1. WHEN a commit is pushed to `main` or a pull request is opened THEN CI SHALL run the format, compile, unused-deps and test checks (DEL-01)
 2. IF any check fails THEN CI SHALL mark the run as failed (DEL-02)
+3. WHEN a commit is pushed to `main` or a pull request is opened THEN CI SHALL build the release Docker image without pushing it (DEL-11)
 
 **Independent Test**: Push a branch with a formatting error and see the run fail.
 
@@ -68,6 +75,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 3. WHEN a `curl` with a JSON body is sent to a capture URL in production THEN the system SHALL show it on the open bin page (DEL-05)
 4. WHILE running in production the system SHALL read the client IP from the `fly-client-ip` header (DEL-06)
 5. IF a production request carries a forged `fly-client-ip` header THEN the recorded `remote_ip` SHALL be the real client address (DEL-07)
+6. WHILE deployed the system SHALL run exactly one app machine that is never auto-stopped (DEL-12)
 
 **Independent Test**: Manual smoke test after deploy, recorded in `validation.md`.
 
@@ -90,7 +98,23 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 
 ## Edge Cases
 
-- IF the `release_command` migration fails THEN Fly SHALL keep the previous release serving (DEL-10)
+- WHEN Fly's health check probes the app over the internal HTTP port THEN the system SHALL answer 200 instead of redirecting (DEL-13)
+
+---
+
+## Implicit-Requirement Sweep
+
+| Dimension | Resolution |
+| --------- | ---------- |
+| Input validation & bounds | N/A because capture limits belong to abuse-limits; delivery adds no input |
+| Failure / partial-failure states | DEL-02 (failed CI run); failed migration is the "Failed `release_command`" assumption |
+| Idempotency / retry | N/A because deploys are manual and the release migrate script is idempotent (Ecto skips applied migrations) |
+| Auth boundaries & rate limits | DEL-07 (forged client IP); LiveDashboard not exposed (assumption); DEL-12 keeps the per-node limiter correct |
+| Concurrency / ordering | DEL-12: one machine, so PubSub broadcasts and Oban cron see a single node |
+| Data lifecycle / expiry | N/A because retention owns expiry; DEL-12 keeps its hourly cron running |
+| Observability | N/A because monitoring beyond Fly's built-in metrics is out of scope |
+| External-dependency failure | DEL-13 (health check); Postgres outage behavior is unchanged from local and not re-specified |
+| State-transition integrity | DEL-03 (migrations run before the new release serves) |
 
 ---
 
@@ -107,9 +131,13 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | DEL-07 | P1: Production deploy | - | Pending |
 | DEL-08 | P1: Reviewer-facing README | - | Pending |
 | DEL-09 | P1: Reviewer-facing README | - | Pending |
-| DEL-10 | P1: Production deploy | - | Pending |
+| DEL-11 | P1: Continuous integration | - | Pending |
+| DEL-12 | P1: Production deploy | - | Pending |
+| DEL-13 | P1: Production deploy | - | Pending |
 
-**Coverage:** 10 total, 0 mapped to tasks, 10 unmapped ⚠️
+DEL-10 is retired: it became the "Failed `release_command`" assumption.
+
+**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
 
 ---
 
