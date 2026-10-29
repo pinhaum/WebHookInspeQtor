@@ -67,6 +67,14 @@ Verifier gaps from `validation.md` (iteration 0): M13 / SP-1, M18, M16 / M17.
 T11 → T12 → T13
 ```
 
+### Phase 5: Review fixes
+
+CodeRabbit findings on PR #6.
+
+```
+T14 → T15 → T16 → T17
+```
+
 ---
 
 ## Task Breakdown
@@ -441,15 +449,122 @@ T11 → T12 → T13
 
 ---
 
+## Review fixes
+
+### T14: Fall back on a non-UTF-8 client IP header
+
+**What**: `ClientIP.from_conn/1` converts the header with `:binary.bin_to_list/1` instead of `String.to_charlist/1`, so a value with non-UTF-8 bytes fails `:inet.parse_strict_address/1` and falls back to the peer address instead of raising.
+**Where**: `lib/whiq_web/client_ip.ex` (test in `client_ip_test.exs`)
+**Depends on**: None (Phase 4)
+**Reuses**: existing `client_ip_test.exs` setup
+**Requirement**: LIM-09, LIM-10 (CAP-20)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Header `<<0xFF, ?1>>` → peer address `198.51.100.9`, no exception
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web`
+- [x] Test count: previous + new tests pass
+
+**Tests**: integration
+**Gate**: full
+
+**Commit**: `fix(web): fall back to the peer ip on a non-utf8 client ip header`
+
+---
+
+### T15: Canonicalize the client IP
+
+**What**: `ClientIP.from_conn/1` returns the parsed address through `:inet.ntoa/1`, so two spellings of one address share a rate-limit key. spec.md's "client IP" line states the canonical form.
+**Where**: `lib/whiq_web/client_ip.ex` (test in `client_ip_test.exs`; spec.md client IP line)
+**Depends on**: T14
+**Reuses**: existing `client_ip_test.exs` setup
+**Requirement**: LIM-09, LIM-10
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] `2001:DB8:0:0::1` and `2001:db8::1` both resolve to `2001:db8::1`
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq_web`
+- [x] Test count: previous + new tests pass
+
+**Tests**: integration
+**Gate**: full
+
+**Commit**: `fix(web): canonicalize the client ip used as a rate-limit key`
+
+---
+
+### T16: Size the test pool for LIM-04
+
+**What**: `config/test.exs` sets `pool_size: max(System.schedulers_online() * 2, 24)`. LIM-04 holds 20 connections at once; with fewer than 10 schedulers the pool was smaller and the ready barrier timed out. LIM-04 asserts `pool_size > @parallel` in `setup_all`, so a smaller pool fails with a named reason instead of a timeout.
+**Where**: `config/test.exs` (precondition in `inspector_concurrency_test.exs`)
+**Depends on**: T15
+**Reuses**: `test/whiq/inspector_concurrency_test.exs`
+**Requirement**: LIM-04
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] With `ELIXIR_ERL_OPTIONS="+S 2"` LIM-04 failed before (no `:ready` after 5000 ms) and passes after
+- [x] Gate check passes: `docker compose run --rm app mix test test/whiq`
+- [x] Test count: baseline passes unchanged
+
+**Tests**: none
+**Gate**: build
+
+**Commit**: `test(inspector): size the test pool for 20 parallel captures`
+
+---
+
+### T17: Give test rate limits a window that cannot close mid-test
+
+**What**: Test windows become one year (`:timer.hours(24 * 365)`) in `config/test.exs` (`:capture_rate_limit`, `:bin_rate_limit`, previously `3_600_000`) and in `rate_limit_test.exs` (previously one hour). Hammer's fixed windows follow the wall clock, so with one-hour windows the hits a test counted could straddle a boundary; that applied to the controller limit tests too. Assertions unchanged; LIM-07 keeps its 1 s window.
+**Where**: `config/test.exs` (test in `rate_limit_test.exs`)
+**Depends on**: T16
+**Reuses**: LIM-07's wall-clock rationale
+**Requirement**: LIM-06, LIM-07, LIM-08, LIM-09, LIM-10, LIM-12
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Every test rate-limit window outside LIM-07 is one year
+- [x] Gate check passes: `docker compose run --rm app mix precommit`
+- [x] Test count: previous tests pass unchanged
+
+**Tests**: unit
+**Gate**: build
+
+**Commit**: `test(limits): use year-long windows in tests`
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5
 
 Phase 1:  T1 ------→ T2 ------→ T3 ------→ T4
 Phase 2:  T5 ------→ T6 ------→ T7 ------→ T8
 Phase 3:  T9 ------→ T10
 Phase 4:  T11 -----→ T12 -----→ T13
+Phase 5:  T14 -----→ T15 -----→ T16 -----→ T17
 ```
 
 ---
@@ -473,6 +588,10 @@ Phase 4:  T11 -----→ T12 -----→ T13
 | T11: client IP test | 1 test file (+ 1 spec line) | ✅ Granular |
 | T12: lock race test | 1 test file | ✅ Granular |
 | T13: chunked read test | 1 test file | ✅ Granular |
+| T14: non-UTF-8 header | 1 conversion call | ✅ Granular |
+| T15: canonical IP | 1 return value (+ 1 spec line) | ✅ Granular |
+| T16: test pool | 1 config line | ✅ Granular |
+| T17: test windows | 2 config values + 1 test attribute | ✅ Granular |
 
 ### Diagram-Definition Cross-Check
 
@@ -491,6 +610,10 @@ Phase 4:  T11 -----→ T12 -----→ T13
 | T11 | None (Phase 3) | start of Phase 4 | ✅ Match |
 | T12 | T11 | T11 → T12 | ✅ Match |
 | T13 | T12 | T12 → T13 | ✅ Match |
+| T14 | None (Phase 4) | start of Phase 5 | ✅ Match |
+| T15 | T14 | T14 → T15 | ✅ Match |
+| T16 | T15 | T15 → T16 | ✅ Match |
+| T17 | T16 | T16 → T17 | ✅ Match |
 
 ### Test Co-location Validation
 
@@ -509,3 +632,7 @@ Phase 4:  T11 -----→ T12 -----→ T13
 | T11 | Controllers | integration | integration | ✅ OK |
 | T12 | Controllers / snapshot | integration | integration | ✅ OK |
 | T13 | Controllers / snapshot | integration | unit | ✅ OK (adapter-level unit; no DB) |
+| T14 | Controllers / snapshot | integration | integration | ✅ OK |
+| T15 | Controllers / snapshot | integration | integration | ✅ OK |
+| T16 | Test config | none | none | ✅ OK (proved by LIM-04 under `+S 2`) |
+| T17 | Rate limiter | unit | unit | ✅ OK |

@@ -11,7 +11,8 @@ config :whiq, Whiq.Repo,
   hostname: System.get_env("DATABASE_HOST", "localhost"),
   database: "whiq_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+  # LIM-04 holds 20 connections at once (test/whiq/inspector_concurrency_test.exs).
+  pool_size: max(System.schedulers_online() * 2, 24)
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
@@ -26,9 +27,10 @@ config :whiq, Whiq.Mailer, adapter: Swoosh.Adapters.Test
 # Keeps the capture read-timeout test (CAP-19) fast; prod uses the 15 s default.
 config :whiq, :capture_read_timeout, 200
 
-# Small limits so tests can hit them; the window outlasts any test run.
-config :whiq, :capture_rate_limit, limit: 2, scale_ms: 3_600_000
-config :whiq, :bin_rate_limit, limit: 1, scale_ms: 3_600_000
+# Small limits so tests can hit them; a one-year window cannot close mid-test,
+# so counted hits never straddle a wall-clock window boundary.
+config :whiq, :capture_rate_limit, limit: 2, scale_ms: :timer.hours(24 * 365)
+config :whiq, :bin_rate_limit, limit: 1, scale_ms: :timer.hours(24 * 365)
 
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false

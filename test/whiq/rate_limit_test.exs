@@ -3,28 +3,30 @@ defmodule Whiq.RateLimitTest do
 
   alias Whiq.RateLimit
 
-  @hour :timer.hours(1)
+  # A window this long cannot close while a test counts hits in it; Hammer's
+  # fixed windows follow the wall clock (div(now, scale_ms)).
+  @window :timer.hours(24 * 365)
 
   test "allows hits up to the limit and denies the next one with retry_after >= 1" do
     key = {:test, make_ref()}
 
-    assert RateLimit.check(key, 3, @hour) == :ok
-    assert RateLimit.check(key, 3, @hour) == :ok
-    assert RateLimit.check(key, 3, @hour) == :ok
-    assert {:error, retry_after} = RateLimit.check(key, 3, @hour)
+    assert RateLimit.check(key, 3, @window) == :ok
+    assert RateLimit.check(key, 3, @window) == :ok
+    assert RateLimit.check(key, 3, @window) == :ok
+    assert {:error, retry_after} = RateLimit.check(key, 3, @window)
     assert is_integer(retry_after)
     assert retry_after >= 1
-    assert retry_after <= div(@hour, 1000)
+    assert retry_after <= div(@window, 1000)
   end
 
   test "two keys count independently" do
     limited = {:test, make_ref()}
     other = {:test, make_ref()}
 
-    assert RateLimit.check(limited, 1, @hour) == :ok
-    assert {:error, _retry_after} = RateLimit.check(limited, 1, @hour)
+    assert RateLimit.check(limited, 1, @window) == :ok
+    assert {:error, _retry_after} = RateLimit.check(limited, 1, @window)
 
-    assert RateLimit.check(other, 1, @hour) == :ok
+    assert RateLimit.check(other, 1, @window) == :ok
   end
 
   # Hammer windows follow the wall clock and take no injected clock, so the
