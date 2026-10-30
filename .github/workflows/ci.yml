@@ -94,7 +94,7 @@ jobs:
             -e DATABASE_URL=ecto://postgres:postgres@localhost:5432/whiq_release \
             -e SECRET_KEY_BASE="$(openssl rand -base64 48)" \
             whiq:ci /app/bin/migrate
-          expected=$(find priv/repo/migrations -name "*.exs" | wc -l)
+          expected=$(find priv/repo/migrations -name "[0-9]*_*.exs" | wc -l)
           applied=$(docker exec "$PG_CONTAINER" psql -U postgres -d whiq_release -tAc "select count(*) from schema_migrations")
           echo "applied=$applied expected=$expected"
           test "$applied" -eq "$expected"
