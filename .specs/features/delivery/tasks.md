@@ -15,15 +15,15 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 ## Test Coverage Matrix
 
-> Generated from codebase, project guidelines, and spec - confirm before Execute. Guidelines found: `AGENTS.md` (ConnTest + `LazyHTML`, assert on ids, `mix precommit` at the end). Floor: `test/whiq_web/controllers/page_controller_test.exs`, `test/whiq_web/client_ip_test.exs`. Infra layers (Dockerfile, `fly.toml`, workflow, README) have no ExUnit surface; their gate is a local command that exercises them (image build, `actionlint`, non-mutating check commands). The ACs that need the live deploy or GitHub are verified in Phase 4 and recorded in `smoke.md`.
+> Generated from codebase, project guidelines, and spec - confirm before Execute. Guidelines found: `AGENTS.md` (ConnTest + `LazyHTML`, assert on ids, `mix precommit` at the end). Floor: `test/whiq_web/controllers/page_controller_test.exs`, `test/whiq_web/client_ip_test.exs`. Infra layers (Dockerfile, `fly.toml`, workflow, README) have no ExUnit surface; their gate is a local command that exercises them (image build, `actionlint`, non-mutating check commands). The ACs that need GitHub are verified in Phase 4 and recorded in `smoke.md`. The live deploy was descoped on 2026-10-30 (see spec Out of Scope).
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | ---------- | ------------------ | -------------------- | ---------------- | ----------- |
 | Controller / router (`/health`) | integration (`ConnTest`) | DEL-13 app side: 200, `text/plain`, body `ok`, no DB access, no session cookie | `test/whiq_web/controllers/health_controller_test.exs` | `docker compose run --rm -T app mix test test/whiq_web/controllers/health_controller_test.exs` |
-| Prod endpoint config (`force_ssl`) | unit (`ExUnit.Case`) | `config/prod.exs` read with `Config.Reader`, fed to `Plug.SSL`: plain-HTTP `/health` passes through, plain-HTTP `/` and `/h/x` get 301 to https, `x-forwarded-proto: https` passes | `test/whiq_web/prod_force_ssl_test.exs` | `docker compose run --rm -T app mix test test/whiq_web/prod_force_ssl_test.exs` |
+| Prod endpoint config (`force_ssl`) | unit (`ExUnit.Case`) | `config/prod.exs` read with `Config.Reader`, fed to `Plug.SSL`: plain-HTTP `/health` passes through, plain-HTTP `GET /` gets 301 and `POST /h/x` 307 to https, `x-forwarded-proto: https` passes | `test/whiq_web/prod_force_ssl_test.exs` | `docker compose run --rm -T app mix test test/whiq_web/prod_force_ssl_test.exs` |
 | Release image (`Dockerfile`, `rel/`, `Whiq.Release`) | none (build gate) | Image builds; `bin/migrate` against compose `db` applies all migrations and exits 0 | `Dockerfile`, `rel/overlays/bin/` | `docker build -t whiq:release .` |
 | `fly.toml` / workflow / README | none | Build gate; workflow linted with `actionlint` | - | see Gate Check Commands |
-| Live deploy and CI | manual smoke | DEL-01..07, DEL-11..13 live, evidence in `smoke.md` | `.specs/features/delivery/smoke.md` | `curl`, `fly`, `gh` (Phase 4) |
+| Live CI | manual smoke | DEL-01, DEL-02, DEL-11 on GitHub, evidence in `smoke.md` | `.specs/features/delivery/smoke.md` | `gh` (Phase 4) |
 
 ## Gate Check Commands
 
@@ -59,11 +59,13 @@ T5 → T6
 T7
 ```
 
-### Phase 4: Live verification (outward-facing, explicit go-ahead per step)
+### Phase 4: CI verification (outward-facing, explicit go-ahead per step)
 
 ```
-T8 → T9 → T10
+T10
 ```
+
+T8 (provision and deploy) and T9 (production smoke test) were removed on 2026-10-30: the live deploy is out of scope for this study project. The first deploy attempt reached `release_command`, which failed because the Fly trial stopped the Postgres machine after 5 minutes. T10 keeps its number.
 
 ---
 
@@ -279,72 +281,6 @@ T8 → T9 → T10
 
 ---
 
-### T8: Provision and deploy (outward-facing)
-
-**What**: With the user's go-ahead and Fly login:
-- `fly apps create whiq` (fallback `whiq-inspector`, updating `fly.toml`, `PHX_HOST` and README)
-- `fly postgres create` + `attach`; fallback `fly mpg create` + `attach`; confirm `DATABASE_URL` is set
-- `fly secrets set SECRET_KEY_BASE=...`
-- `fly deploy --ha=false`
-
-Record the commands and their outputs, with no secret values, in `smoke.md`.
-**Where**: `.specs/features/delivery/smoke.md` (new)
-**Depends on**: None (runs after Phase 3)
-**Reuses**: `fly.toml` from T4
-**Requirement**: DEL-03, DEL-12, DEL-13
-
-**Tools**:
-
-- MCP: NONE
-- Skill: `ecc:deployment-patterns`, `superpowers:verification-before-completion`
-
-**Done when**:
-
-- [ ] Deploy log shows `release_command` exit 0 and the machine started
-- [ ] `fly machine list` shows exactly 1 app machine; `fly status` shows the `/health` check passing
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
-
-**Tests**: manual
-**Gate**: build
-
-**Commit**: `docs(delivery): record deploy evidence`
-
----
-
-### T9: Production smoke test (outward-facing)
-
-**What**: Against `https://whiq.fly.dev`:
-- create a bin
-- `curl` a JSON body to its capture URL and see it on the open bin page (DEL-05)
-- `curl http://...` gets a redirect to https (DEL-04)
-- recorded `remote_ip` equals the caller's public IP (DEL-06)
-- a forged `fly-client-ip` header does not change the recorded IP (DEL-07)
-
-Record the evidence in `smoke.md`. If DEL-07 fails, add a fix task for plan B (right-parsed `x-forwarded-for`).
-**Where**: `.specs/features/delivery/smoke.md` (modify)
-**Depends on**: T8
-**Reuses**: spec "Independent Test"
-**Requirement**: DEL-04, DEL-05, DEL-06, DEL-07
-
-**Tools**:
-
-- MCP: `chrome-devtools` (bin page)
-- Skill: `superpowers:verification-before-completion`
-
-**Done when**:
-
-- [ ] Each of DEL-04..07 has a command, its output and a pass/fail line in `smoke.md`
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
-
-**Tests**: manual
-**Gate**: build
-
-**Commit**: `docs(delivery): record production smoke test`
-
----
-
 ### T10: Verify CI on GitHub (outward-facing)
 
 **What**: With the user's go-ahead to push and open the PR, confirm on GitHub:
@@ -352,8 +288,8 @@ Record the evidence in `smoke.md`. If DEL-07 fails, add a fix task for plan B (r
 - a throwaway branch with a formatting error fails `checks` (DEL-02); delete that branch afterwards
 
 Record the run URLs in `smoke.md`.
-**Where**: `.specs/features/delivery/smoke.md` (modify)
-**Depends on**: T9
+**Where**: `.specs/features/delivery/smoke.md` (new)
+**Depends on**: None (runs after Phase 3)
 **Reuses**: `gh run list` / `gh run view`
 **Requirement**: DEL-01, DEL-02, DEL-11
 
@@ -386,8 +322,6 @@ Record the run URLs in `smoke.md`.
 | T5 | 1 job | ✅ Granular |
 | T6 | 1 job | ✅ Granular |
 | T7 | 1 file | ✅ Granular |
-| T8 | 1 deploy | ✅ Granular |
-| T9 | 1 smoke run | ✅ Granular |
 | T10 | 1 CI check | ✅ Granular |
 
 ## Diagram-Definition Cross-Check
@@ -401,9 +335,7 @@ Record the run URLs in `smoke.md`.
 | T5 | None (after Phase 1) | phase 2 start | ✅ Match |
 | T6 | T5 | T5 → T6 | ✅ Match |
 | T7 | None (after Phase 2) | phase 3 start | ✅ Match |
-| T8 | None (after Phase 3) | phase 4 start | ✅ Match |
-| T9 | T8 | T8 → T9 | ✅ Match |
-| T10 | T9 | T9 → T10 | ✅ Match |
+| T10 | None (after Phase 3) | phase 4 start | ✅ Match |
 
 ## Test Co-location Validation
 
@@ -416,6 +348,4 @@ Record the run URLs in `smoke.md`.
 | T5 | workflow | none | none | ✅ OK |
 | T6 | workflow | none | none | ✅ OK |
 | T7 | README | none | none | ✅ OK |
-| T8 | Live deploy | manual smoke | manual | ✅ OK |
-| T9 | Live deploy | manual smoke | manual | ✅ OK |
 | T10 | Live CI | manual smoke | manual | ✅ OK |

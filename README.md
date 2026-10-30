@@ -4,7 +4,7 @@ Capture any HTTP request on a throwaway URL and watch it arrive live, byte for b
 
 [![CI](https://github.com/pinhaum/WebHookInspeQtor/actions/workflows/ci.yml/badge.svg)](https://github.com/pinhaum/WebHookInspeQtor/actions/workflows/ci.yml)
 
-**Live demo:** https://whiq.fly.dev
+A study project. It is deploy-ready for Fly.io (release image, `fly.toml`, health check) but not deployed: Fly has no free plan that keeps a machine running.
 
 ## What it does
 
@@ -35,7 +35,7 @@ docker compose run --rm app mix test
 - **Capture path.** `/h/:token` sits in a router scope with no pipeline. The controller reads the raw body itself, checks the per-bin rate limit, and stores the request in a transaction that locks the bin row and evicts the oldest request once the bin holds 100.
 - **Live updates.** After a capture commits, `Inspector` broadcasts `{:request_captured, request}` (and `{:request_evicted, id}`) on the bin's Phoenix PubSub topic. `BinLive` subscribes on mount and streams the list.
 - **Retention.** An hourly Oban cron job deletes expired bins; their requests go with them through `ON DELETE CASCADE`. Oban prunes its own finished jobs after 7 days.
-- **Single node.** The rate limiter keeps its counters in ETS, PubSub is local, and the Oban cron must run somewhere. Production therefore runs exactly one always-on Fly machine.
+- **Single node.** The rate limiter keeps its counters in ETS, PubSub is local, and the Oban cron must run somewhere. `fly.toml` therefore pins exactly one always-on machine.
 
 ## Decisions
 
@@ -50,7 +50,7 @@ The full log, with trade-offs, lives in [`.specs/STATE.md`](.specs/STATE.md).
 - **AD-007 Never drop data silently.** Oversized bodies are truncated with a flag, and full bins evict their oldest request. Only the rate limit answers 429.
 - **AD-008 Bytes, not text.** Bodies, header names and values, and content types are stored as `bytea`, because senders may send non-UTF-8 header bytes.
 
-Deploy assumptions:
+Deploy assumptions, as configured in `fly.toml` (`fly deploy --ha=false` after `fly apps create`, a Postgres attached as `DATABASE_URL`, and a `SECRET_KEY_BASE` secret):
 
 - **One machine.** `min_machines_running = 1`, auto-stop off, first deploy with `fly deploy --ha=false`. This follows from the single-node design above.
 - **Failed migrations keep the old release.** Migrations run as Fly's `release_command`. If they fail, Fly aborts the deploy and the previous release keeps serving. This is documented Fly behavior and is not tested here.
@@ -58,4 +58,4 @@ Deploy assumptions:
 ## Known fidelity limits
 
 - **Header names are lowercased.** Bandit lowercases them per the Plug spec, and HTTP/2 has no header casing anyway.
-- **Plain-HTTP captures are not stored.** In production the Fly proxy redirects `http://` to `https://` before the app sees the request. Senders must use the HTTPS capture URL.
+- **Plain-HTTP captures are not stored.** Deployed behind Fly, the proxy redirects `http://` to `https://` before the app sees the request. Senders must use the HTTPS capture URL.

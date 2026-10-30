@@ -7,7 +7,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 ## Goals
 
 - [ ] Every push to `main` and every pull request runs the full check suite.
-- [ ] The app runs on Fly.io with a public HTTPS URL.
+- [ ] The app is deploy-ready for Fly.io: a release image that migrates on start and a `fly.toml`. A live deploy is out of scope.
 - [ ] The README lets a reviewer understand the design in five minutes.
 
 ## Out of Scope
@@ -18,6 +18,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | Multi-region or clustering | Single machine is enough; rate limiter, PubSub and Oban cron assume one live node |
 | Managed database (backups, HA) | Bin data is ephemeral (7 days); legacy Fly Postgres is enough |
 | Monitoring beyond Fly's built-in metrics | Scope |
+| Live production deploy (retires DEL-05, DEL-06, DEL-07, DEL-12) | Study project. Fly has no free plan for new accounts, and a trial machine stops after 5 minutes (observed 2026-10-30, the Postgres machine stopped before the first `release_command`). The release image and `fly.toml` stay as deploy-ready artefacts |
 
 ---
 
@@ -62,22 +63,20 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 
 ---
 
-### P1: Production deploy ⭐ MVP
+### P1: Deploy readiness ⭐ MVP
 
-**User Story**: As a reviewer, I want a live URL so that I can try the inspector without cloning it.
+**User Story**: As a reviewer, I want the project to ship a production release so that I can see it is deployable without it running live.
 
-**Why P1**: A demo is worth more than a description.
+**Why P1**: A release that migrates and redirects correctly is the deployable core; running it live is out of scope.
 
 **Acceptance Criteria**:
 
-1. WHEN `fly deploy` runs THEN the system SHALL build the release image, run pending migrations and start serving (DEL-03)
-2. WHEN a plain-HTTP request reaches the app's Fly hostname THEN the system SHALL redirect it to HTTPS (DEL-04)
-3. WHEN a `curl` with a JSON body is sent to a capture URL in production THEN the system SHALL show it on the open bin page (DEL-05)
-4. WHILE running in production the system SHALL read the client IP from the `fly-client-ip` header (DEL-06)
-5. IF a production request carries a forged `fly-client-ip` header THEN the recorded `remote_ip` SHALL be the real client address (DEL-07)
-6. WHILE deployed the system SHALL run exactly one app machine that is never auto-stopped (DEL-12)
+1. WHEN the release image runs `/app/bin/migrate` against an empty database THEN it SHALL apply every pending migration and exit 0 (DEL-03)
+2. WHEN a plain-HTTP request with a non-local host reaches the endpoint under the prod config THEN the system SHALL redirect it to HTTPS (DEL-04)
 
-**Independent Test**: Manual smoke test after deploy, recorded in `validation.md`.
+DEL-05, DEL-06, DEL-07 and DEL-12 are retired with the live deploy (see Out of Scope).
+
+**Independent Test**: Build the release image and run its migrate script against a fresh compose database.
 
 ---
 
@@ -109,9 +108,9 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | Input validation & bounds | N/A because capture limits belong to abuse-limits; delivery adds no input |
 | Failure / partial-failure states | DEL-02 (failed CI run); failed migration is the "Failed `release_command`" assumption |
 | Idempotency / retry | N/A because deploys are manual and the release migrate script is idempotent (Ecto skips applied migrations) |
-| Auth boundaries & rate limits | DEL-07 (forged client IP); LiveDashboard not exposed (assumption); DEL-12 keeps the per-node limiter correct |
-| Concurrency / ordering | DEL-12: one machine, so PubSub broadcasts and Oban cron see a single node |
-| Data lifecycle / expiry | N/A because retention owns expiry; DEL-12 keeps its hourly cron running |
+| Auth boundaries & rate limits | LiveDashboard not exposed (assumption); forged `fly-client-ip` (DEL-07) is retired with the live deploy |
+| Concurrency / ordering | `fly.toml` pins one always-on machine so PubSub and Oban cron see a single node (DEL-12 retired, config kept) |
+| Data lifecycle / expiry | N/A because retention owns expiry |
 | Observability | N/A because monitoring beyond Fly's built-in metrics is out of scope |
 | External-dependency failure | DEL-13 (health check); Postgres outage behavior is unchanged from local and not re-specified |
 | State-transition integrity | DEL-03 (migrations run before the new release serves) |
@@ -124,20 +123,20 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | -------------- | ----- | ----- | ------ |
 | DEL-01 | P1: Continuous integration | T5, T10 | In progress |
 | DEL-02 | P1: Continuous integration | T5, T10 | In progress |
-| DEL-03 | P1: Production deploy | T1, T4, T8 | In progress |
-| DEL-04 | P1: Production deploy | T3, T4, T9 | In progress |
-| DEL-05 | P1: Production deploy | - | Pending |
-| DEL-06 | P1: Production deploy | - | Pending |
-| DEL-07 | P1: Production deploy | - | Pending |
+| DEL-03 | P1: Deploy readiness | T1 | Done |
+| DEL-04 | P1: Deploy readiness | T3 | Done |
+| DEL-05 | (live deploy) | - | Retired |
+| DEL-06 | (live deploy) | - | Retired |
+| DEL-07 | (live deploy) | - | Retired |
 | DEL-08 | P1: Reviewer-facing README | T7 | Done |
 | DEL-09 | P1: Reviewer-facing README | T7 | Done |
 | DEL-11 | P1: Continuous integration | T6, T10 | In progress |
-| DEL-12 | P1: Production deploy | T4, T8 | In progress |
-| DEL-13 | P1: Production deploy | T2, T3, T4, T8 | In progress |
+| DEL-12 | (live deploy) | T4 | Retired |
+| DEL-13 | Edge case | T2, T3, T4 | Done |
 
-DEL-10 is retired: it became the "Failed `release_command`" assumption.
+DEL-10 is retired: it became the "Failed `release_command`" assumption. DEL-05, DEL-06, DEL-07 and DEL-12 are retired with the live deploy.
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
+**Coverage:** 8 active, 8 mapped to tasks, 0 unmapped. 4 retired.
 
 ---
 
