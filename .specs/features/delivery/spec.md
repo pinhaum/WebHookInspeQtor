@@ -25,7 +25,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Host | Fly.io app + legacy (unmanaged) Fly Postgres created with `fly postgres create`, attached over the private network | User choice; cheapest Fly option, no managed backups needed for 7-day data | y |
+| Host | Fly.io app + legacy (unmanaged) Fly Postgres via `fly postgres create` if it still creates new clusters; otherwise Fly Managed Postgres (`fly mpg create`). Decided at deploy time | User choice; legacy is cheapest and 7-day data needs no managed backups. Fly forum reports the legacy commands as deprecated (not confirmed in official docs). The app only reads `DATABASE_URL`, so either works | y |
 | Topology | Exactly one app machine, always on: `min_machines_running = 1`, auto-stop disabled | Hammer ETS limiter and Phoenix PubSub are per node, and the hourly retention cron only runs while a node is up | y |
 | Release image | `mix phx.gen.release --docker` output | Official generator | y |
 | Migrations | Fly `release_command` runs the release migrate script | Runs before new machines take traffic | y |
