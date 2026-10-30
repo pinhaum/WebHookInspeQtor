@@ -111,10 +111,10 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `GET /health` → status 200, `content-type` starts with `text/plain`, body `ok`
-- [ ] Response carries no `set-cookie` (no `:browser` pipeline)
-- [ ] Gate check passes: `docker compose run --rm -T app mix test`
-- [ ] Test count: baseline + new tests pass
+- [x] `GET /health` → status 200, `content-type` starts with `text/plain`, body `ok`
+- [x] Response carries no `set-cookie` (no `:browser` pipeline)
+- [x] Gate check passes: `docker compose run --rm -T app mix test`
+- [x] Test count: baseline + new tests pass
 
 **Tests**: integration
 **Gate**: full

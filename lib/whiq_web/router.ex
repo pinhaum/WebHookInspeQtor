@@ -25,6 +25,11 @@ defmodule WhiqWeb.Router do
     match :*, "/:token/*path", CaptureController, :capture
   end
 
+  # No pipeline: Fly's health check needs no session or body parsing.
+  scope "/", WhiqWeb do
+    get "/health", HealthController, :show
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:whiq, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
