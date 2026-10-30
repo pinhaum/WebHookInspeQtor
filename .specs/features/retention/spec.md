@@ -24,11 +24,11 @@ Bins expire 7 days after creation, but expiry only matters if expired data is ac
 | --------------------- | -------------- | --------- | ---------- |
 | Scheduler | Oban cron plugin, hourly | Project requirement; survives restarts, has retries | y |
 | Deletion | Delete bins with `expires_at <= now`; requests go through `on_delete: :delete_all` | One statement, the database does the cascade | y |
-| Clock | `now` is the app clock (`DateTime.utc_now(:second)`), as in `Inspector.fetch_live_bin/2` | Read path and prune agree on the boundary: a bin is live exactly while `expires_at > now` | n |
-| Oban install | Oban is added by this feature (dep, `oban_jobs` migration, supervision, `testing: :manual` in test) | Foundation never installed it; retention is its first user | n |
-| Oban job history | `Oban.Pruner` (`pruner: [max_age: {7, :days}]`; `Oban.Plugins.Pruner` is deprecated in 2.24) | Bounded-storage goal applies to `oban_jobs` too; a week of history covers debugging a failed run | n |
-| Index | Index on `bins.expires_at` | bin-creation design deferred it to this feature; keeps the hourly delete off a sequential scan | n |
-| Oban child options under test | `start/2` passes `Application.fetch_env!(:whiq, Oban)` unchanged; tests assert that env normalized by `Oban.Config.new/1` plus that Oban runs on `Whiq.Repo`. A mutant that edits the options inside `start/2` (M13) is accepted as undetectable under `testing: :manual` | `testing: :manual` strips plugins from the running config; a seam only for tests adds structure without behavior | n |
+| Clock | `now` is the app clock (`DateTime.utc_now(:second)`), as in `Inspector.fetch_live_bin/2` | Read path and prune agree on the boundary: a bin is live exactly while `expires_at > now` | y |
+| Oban install | Oban is added by this feature (dep, `oban_jobs` migration, supervision, `testing: :manual` in test) | Foundation never installed it; retention is its first user | y |
+| Oban job history | `Oban.Pruner` (`pruner: [max_age: {7, :days}]`; `Oban.Plugins.Pruner` is deprecated in 2.24) | Bounded-storage goal applies to `oban_jobs` too; a week of history covers debugging a failed run | y |
+| Index | Index on `bins.expires_at` | bin-creation design deferred it to this feature; keeps the hourly delete off a sequential scan | y |
+| Oban child options under test | `start/2` passes `Application.fetch_env!(:whiq, Oban)` unchanged; tests assert that env normalized by `Oban.Config.new/1` plus that Oban runs on `Whiq.Repo`. A mutant that edits the options inside `start/2` (M13) is accepted as undetectable under `testing: :manual` | `testing: :manual` strips plugins from the running config; a seam only for tests adds structure without behavior | y |
 | Open bin page when its bin is pruned | Nothing happens until the next navigation, which 404s | Already out of scope in live-inspection | y |
 | Prune racing a capture | Delete waits on the capture's `FOR UPDATE` row lock; a capture that loses the race gets `:not_found` | Accepted in abuse-limits design | y |
 | Batching | Single delete, no batching | Worst case is about one day of bins; small | y |

@@ -1,0 +1,30 @@
+# Single always-on machine: the rate limiter (ETS), PubSub and the Oban
+# retention cron all assume one node. First deploy: `fly deploy --ha=false`.
+app = 'whiq'
+primary_region = 'gru'
+
+[deploy]
+  release_command = '/app/bin/migrate'
+
+[env]
+  PHX_HOST = 'whiq.fly.dev'
+  PORT = '8080'
+  ECTO_IPV6 = 'true'
+  ERL_AFLAGS = '-proto_dist inet6_tcp'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    method = 'GET'
+    path = '/health'
+    grace_period = '10s'
+    interval = '30s'
+    timeout = '5s'
+
+[[vm]]
+  size = 'shared-cpu-1x'

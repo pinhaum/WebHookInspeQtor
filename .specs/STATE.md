@@ -67,3 +67,12 @@
 - **Status**: active
 
 ## Handoff
+
+- **Feature**: delivery (`.specs/features/delivery/`), complete: Verifier PASS (iteration 2), `validate_state` 0 errors
+- **Phase / Task**: all tasks done (T1-T7, T10; T8/T9 removed with the descoped live deploy)
+- **Completed**: release image, `/health`, force_ssl exclude, `fly.toml`, CI (`checks` + `release-image`), README, CI evidence in `smoke.md`, verifier fixes (`015ba5a`)
+- **In-progress** (file:line): none
+- **Next step**: push `feat/delivery` (needs go-ahead) so PR #9 gets the local commits; merge PR #8 (retention) then PR #9; confirm the `push` to `main` CI run. Ask the user about lesson candidates L-010..L-015 and the `Confirmed? n` assumption rows in the retention and delivery specs.
+- **Blockers**: none. DEL-03 is now gated in CI (`release-image` compares applied migrations with the files).
+- **Uncommitted files**: none
+- **Branch**: feat/delivery (PR #9, base feat/retention; PR #8 retention -> main)
