@@ -32,6 +32,9 @@ config :whiq, :capture_read_timeout, 200
 config :whiq, :capture_rate_limit, limit: 2, scale_ms: :timer.hours(24 * 365)
 config :whiq, :bin_rate_limit, limit: 1, scale_ms: :timer.hours(24 * 365)
 
+# Jobs run only when a test performs them (Oban.Testing).
+config :whiq, Oban, testing: :manual
+
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 

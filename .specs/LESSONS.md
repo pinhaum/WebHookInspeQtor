@@ -68,6 +68,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md SP-1 (LIM-09, LIM-10) (spec)
 - last seen: 2026-10-28T20:44:50Z
 
+### L-010 - When a behavior depends on a supervised child, assert the running app has started it, not only that its config is valid
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `config` · harmful: 0
+- features: retention
+- evidence: validation.md M12 lib/whiq/application.ex:13 (config)
+- last seen: 2026-10-29T19:54:55Z
+
+### L-011 - Test the options the application passes to a supervised child, not a config rebuilt from the env in the test
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `config` · harmful: 0
+- features: retention
+- evidence: validation.md M13 lib/whiq/application.ex:13 (config)
+- last seen: 2026-10-29T19:54:56Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

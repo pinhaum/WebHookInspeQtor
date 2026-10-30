@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 10,
+  "next_id": 12,
   "lessons": [
     {
       "id": "L-001",
@@ -166,6 +166,42 @@
       ],
       "created": "2026-10-28T20:44:50Z",
       "last_seen": "2026-10-28T20:44:50Z"
+    },
+    {
+      "id": "L-010",
+      "key": "surviving_mutant::when a behavior depends on a supervised child assert the running app has started it not only that its config is valid",
+      "text": "When a behavior depends on a supervised child, assert the running app has started it, not only that its config is valid",
+      "signal": "surviving_mutant",
+      "scope": "config",
+      "status": "candidate",
+      "features": [
+        "retention"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M12 lib/whiq/application.ex:13 (config)"
+      ],
+      "created": "2026-10-29T19:54:55Z",
+      "last_seen": "2026-10-29T19:54:55Z"
+    },
+    {
+      "id": "L-011",
+      "key": "surviving_mutant::test the options the application passes to a supervised child not a config rebuilt from the env in the test",
+      "text": "Test the options the application passes to a supervised child, not a config rebuilt from the env in the test",
+      "signal": "surviving_mutant",
+      "scope": "config",
+      "status": "candidate",
+      "features": [
+        "retention"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M13 lib/whiq/application.ex:13 (config)"
+      ],
+      "created": "2026-10-29T19:54:56Z",
+      "last_seen": "2026-10-29T19:54:56Z"
     }
   ]
 }
