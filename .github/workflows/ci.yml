@@ -56,6 +56,20 @@ jobs:
   # Never pushes: there is no registry login and push is false.
   release-image:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: whiq_release
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
     steps:
       - uses: actions/checkout@v7
 
@@ -65,5 +79,22 @@ jobs:
         with:
           context: .
           push: false
+          load: true
+          tags: whiq:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Fly's release_command only checks the exit status, so also check that
+      # the packaged script applied every migration file.
+      - name: Run the packaged migrate on an empty database
+        env:
+          PG_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          docker run --rm --network host \
+            -e DATABASE_URL=ecto://postgres:postgres@localhost:5432/whiq_release \
+            -e SECRET_KEY_BASE="$(openssl rand -base64 48)" \
+            whiq:ci /app/bin/migrate
+          expected=$(find priv/repo/migrations -name "*.exs" | wc -l)
+          applied=$(docker exec "$PG_CONTAINER" psql -U postgres -d whiq_release -tAc "select count(*) from schema_migrations")
+          echo "applied=$applied expected=$expected"
+          test "$applied" -eq "$expected"
