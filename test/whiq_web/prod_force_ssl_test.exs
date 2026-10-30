@@ -44,8 +44,7 @@ defmodule WhiqWeb.ProdForceSSLTest do
 
     assert conn.halted
     assert conn.status == 301
-    assert [location] = Plug.Conn.get_resp_header(conn, "location")
-    assert String.starts_with?(location, "https://#{@host}")
+    assert Plug.Conn.get_resp_header(conn, "location") == ["https://#{@host}/"]
   end
 
   test "DEL-04: plain-HTTP POST /h/abc is redirected to https keeping the method", %{
@@ -55,8 +54,7 @@ defmodule WhiqWeb.ProdForceSSLTest do
 
     assert conn.halted
     assert conn.status == 307
-    assert [location] = Plug.Conn.get_resp_header(conn, "location")
-    assert String.starts_with?(location, "https://#{@host}")
+    assert Plug.Conn.get_resp_header(conn, "location") == ["https://#{@host}/h/abc"]
   end
 
   test "DEL-04: GET / forwarded as https by the proxy passes through", %{ssl_opts: opts} do
