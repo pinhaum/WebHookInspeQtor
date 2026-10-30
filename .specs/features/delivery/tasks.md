@@ -138,11 +138,11 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] Plain-HTTP `GET /health` with a non-local host is not halted
-- [ ] Plain-HTTP `GET /` and `POST /h/abc` with a non-local host are halted with 301 and a `location` starting `https://`
-- [ ] `GET /` with `x-forwarded-proto: https` is not halted
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: previous + new tests pass
+- [x] Plain-HTTP `GET /health` with a non-local host is not halted
+- [x] Plain-HTTP `GET /` (301) and `POST /h/abc` (307, `Plug.SSL` keeps the method for non-GET/HEAD) with a non-local host are halted with a `location` starting `https://`
+- [x] `GET /` with `x-forwarded-proto: https` is not halted
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: previous + new tests pass
 
 **Tests**: unit
 **Gate**: build

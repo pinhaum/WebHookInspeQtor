@@ -125,7 +125,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | DEL-01 | P1: Continuous integration | - | Pending |
 | DEL-02 | P1: Continuous integration | - | Pending |
 | DEL-03 | P1: Production deploy | T1, T4, T8 | In progress |
-| DEL-04 | P1: Production deploy | - | Pending |
+| DEL-04 | P1: Production deploy | T3, T4, T9 | In progress |
 | DEL-05 | P1: Production deploy | - | Pending |
 | DEL-06 | P1: Production deploy | - | Pending |
 | DEL-07 | P1: Production deploy | - | Pending |
