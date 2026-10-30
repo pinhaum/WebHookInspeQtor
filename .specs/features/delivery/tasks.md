@@ -173,10 +173,10 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] Every key above is present with the stated value
-- [ ] `.dockerignore` does not exclude anything the image needs; `fly.toml` itself excluded or harmless
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit` and `docker build -t whiq:release .`
-- [ ] Test count: baseline passes unchanged
+- [x] Every key above is present with the stated value
+- [x] `.dockerignore` does not exclude anything the image needs; `fly.toml` itself excluded or harmless
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit` and `docker build -t whiq:release .`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build
