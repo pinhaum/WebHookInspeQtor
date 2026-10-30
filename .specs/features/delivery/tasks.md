@@ -84,10 +84,10 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `docker build -t whiq:release .` succeeds
-- [ ] `bin/migrate` in the image, pointed at the compose `db` on a fresh database, exits 0 and leaves all 5 migrations applied, `oban_jobs` included
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] `docker build -t whiq:release .` succeeds
+- [x] `bin/migrate` in the image, pointed at the compose `db` on a fresh database, exits 0 and leaves all 5 migrations applied, `oban_jobs` included
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build
