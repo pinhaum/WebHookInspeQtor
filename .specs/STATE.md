@@ -68,11 +68,11 @@
 
 ## Handoff
 
-- **Feature**: delivery (`.specs/features/delivery/`)
-- **Phase / Task**: Phase 1 / T1 - generate the release files
-- **Completed**: none (spec, design and tasks approved and committed)
+- **Feature**: delivery (`.specs/features/delivery/`), complete: Verifier PASS (iteration 2), `validate_state` 0 errors
+- **Phase / Task**: all tasks done (T1-T7, T10; T8/T9 removed with the descoped live deploy)
+- **Completed**: release image, `/health`, force_ssl exclude, `fly.toml`, CI (`checks` + `release-image`), README, CI evidence in `smoke.md`, verifier fixes (`015ba5a`)
 - **In-progress** (file:line): none
-- **Next step**: Execute T1-T7 per `tasks.md`, one atomic commit each; stop before Phase 4 (T8-T10) and ask the user for go-ahead on each outward-facing step.
-- **Blockers**: Phase 4 needs a Fly account login and a push go-ahead; `feat/retention` is still unpushed and `feat/delivery` is stacked on it.
+- **Next step**: push `feat/delivery` (needs go-ahead) so PR #9 gets the local commits; merge PR #8 (retention) then PR #9; confirm the `push` to `main` CI run. Ask the user about lesson candidates L-010..L-015 and the `Confirmed? n` assumption rows in the retention and delivery specs.
+- **Blockers**: none. Accepted risk: DEL-03 (`bin/migrate`) has manual evidence only.
 - **Uncommitted files**: none
-- **Branch**: feat/delivery (based on feat/retention)
+- **Branch**: feat/delivery (PR #9, base feat/retention; PR #8 retention -> main)

@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-A portfolio project is judged by its public face: a live URL, green CI and a README that explains the reasoning. The app needs a production release image, an automated check pipeline, a deploy to Fly.io and documentation of the decisions made along the way.
+A portfolio project is judged by its public face: green CI, a deployable release and a README that explains the reasoning. The app needs a production release image, an automated check pipeline, a Fly.io config ready to deploy and documentation of the decisions made along the way.
 
 ## Goals
 

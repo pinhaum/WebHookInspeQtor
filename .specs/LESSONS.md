@@ -80,6 +80,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md M13 lib/whiq/application.ex:13 (config)
 - last seen: 2026-10-29T19:54:56Z
 
+### L-012 - To prove a route skips the :browser pipeline, assert an outcome the pipeline changes (406 on accept: application/json, or x-frame-options), not the absence of set-cookie.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `test/router` · harmful: 0
+- features: delivery
+- evidence: mutant B, test/whiq_web/controllers/health_controller_test.exs:11 (test/router)
+- last seen: 2026-10-30T16:59:33Z
+
+### L-013 - When a descope retires part of a feature, sweep every AC and Success Criteria line for clauses that depended on it.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: delivery
+- evidence: DEL-08, spec.md:91 (specs)
+- last seen: 2026-10-30T16:59:33Z
+
+### L-014 - Evidence for a migrate-on-release AC must check the applied migration count, not only the exit code.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `release` · harmful: 0
+- features: delivery
+- evidence: mutant F, lib/whiq/release.ex:12 (release)
+- last seen: 2026-10-30T16:59:33Z
+
+### L-015 - Each force_ssl exclude clause (paths and hosts) needs its own pass-through test against the real prod config.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `config` · harmful: 0
+- features: delivery
+- evidence: mutant D2, config/prod.exs (config)
+- last seen: 2026-10-30T16:59:33Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
