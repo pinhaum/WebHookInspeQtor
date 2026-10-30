@@ -67,3 +67,12 @@
 - **Status**: active
 
 ## Handoff
+
+- **Feature**: delivery (`.specs/features/delivery/`)
+- **Phase / Task**: Phase 1 / T1 - generate the release files
+- **Completed**: none (spec, design and tasks approved and committed)
+- **In-progress** (file:line): none
+- **Next step**: Execute T1-T7 per `tasks.md`, one atomic commit each; stop before Phase 4 (T8-T10) and ask the user for go-ahead on each outward-facing step.
+- **Blockers**: Phase 4 needs a Fly account login and a push go-ahead; `feat/retention` is still unpushed and `feat/delivery` is stacked on it.
+- **Uncommitted files**: none
+- **Branch**: feat/delivery (based on feat/retention)
