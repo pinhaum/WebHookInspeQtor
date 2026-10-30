@@ -24,7 +24,12 @@ The run is marked failed. PR #10 was closed and `ci/format-check-proof` deleted 
 
 ## Release migrate (DEL-03)
 
-No automated gate covers `bin/migrate`; it is verified by hand. On 2026-10-30 the Verifier built the image from `aec1887`, ran `/app/bin/migrate` against a fresh database on the compose network, and found exit 0, all 5 versions in `schema_migrations` and `oban_jobs` present. A second run also exited 0. Check the applied count, not only the exit code: a mutant that migrated 1 of 5 still exited 0.
+The `release-image` job now runs the packaged `/app/bin/migrate` against an empty Postgres and compares the applied count in `schema_migrations` with the timestamped files in `priv/repo/migrations`.
+
+- Run 41118214092 on `3c73fbb`: `applied=5 expected=5`, success. https://github.com/pinhaum/WebHookInspeQtor/actions/runs/41118214092/job/124277863693
+- Run 41117981402 on `4a58d99` failed with `applied=5 expected=6` because the count included `.formatter.exs`. That failure shows the comparison fails the job on a mismatch.
+
+Earlier manual check (Verifier, 2026-10-30, image from `aec1887`): exit 0, 5/5 versions, `oban_jobs` present, second run also exit 0.
 
 ## Not covered
 
