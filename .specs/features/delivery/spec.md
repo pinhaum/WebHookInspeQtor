@@ -7,7 +7,7 @@ A portfolio project is judged by its public face: green CI, a deployable release
 ## Goals
 
 - [ ] Every push to `main` and every pull request runs the full check suite.
-- [ ] The app is deploy-ready for Fly.io: a release image that migrates on start and a `fly.toml`. A live deploy is out of scope.
+- [ ] The app is deploy-ready for Fly.io: a release image whose `bin/migrate` runs as Fly's `release_command` before the new release starts, and a `fly.toml`. A live deploy is out of scope.
 - [ ] The README lets a reviewer understand the design in five minutes.
 
 ## Out of Scope
@@ -27,7 +27,7 @@ A portfolio project is judged by its public face: green CI, a deployable release
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | Host | Fly.io app + legacy (unmanaged) Fly Postgres via `fly postgres create` if it still creates new clusters; otherwise Fly Managed Postgres (`fly mpg create`). Decided at deploy time | User choice; legacy is cheapest and 7-day data needs no managed backups. Fly forum reports the legacy commands as deprecated (not confirmed in official docs). The app only reads `DATABASE_URL`, so either works | y |
-| Topology | Exactly one app machine, always on: `min_machines_running = 1`, auto-stop disabled | Hammer ETS limiter and Phoenix PubSub are per node, and the hourly retention cron only runs while a node is up | y |
+| Topology | Exactly one app machine, always on: the first deploy runs `fly deploy --ha=false` (creates one machine); `min_machines_running = 1` and auto-stop disabled keep it running. `min_machines_running` is a floor, not a cap | Hammer ETS limiter and Phoenix PubSub are per node, and the hourly retention cron only runs while a node is up | y |
 | Release image | `mix phx.gen.release --docker` output | Official generator | y |
 | Migrations | Fly `release_command` runs the release migrate script | Runs before new machines take traffic | y |
 | HTTPS | Fly proxy forces HTTPS; plain-HTTP captures get redirected and are not stored | Senders almost always use HTTPS; avoids storing secrets sent in clear | y |

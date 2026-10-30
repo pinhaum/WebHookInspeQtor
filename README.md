@@ -52,7 +52,7 @@ The full log, with trade-offs, lives in [`.specs/STATE.md`](.specs/STATE.md).
 
 Deploy assumptions, as configured in `fly.toml` (`fly deploy --ha=false` after `fly apps create`, a Postgres attached as `DATABASE_URL`, and a `SECRET_KEY_BASE` secret):
 
-- **One machine.** `min_machines_running = 1`, auto-stop off, first deploy with `fly deploy --ha=false`. This follows from the single-node design above.
+- **One machine.** The first deploy runs `fly deploy --ha=false`, which creates a single machine; `min_machines_running = 1` and auto-stop off keep it running. `min_machines_running` is a floor, not a cap, so do not scale the app out. This follows from the single-node design above.
 - **Failed migrations keep the old release.** Migrations run as Fly's `release_command`. If they fail, Fly aborts the deploy and the previous release keeps serving. This is documented Fly behavior and is not tested here.
 
 ## Known fidelity limits
