@@ -300,9 +300,9 @@ Record the run URLs in `smoke.md`.
 
 **Done when**:
 
-- [ ] Green run URL for the PR and red run URL for the throwaway branch recorded
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] Green run URL for the PR and red run URL for the throwaway branch recorded
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: manual
 **Gate**: build

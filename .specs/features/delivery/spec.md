@@ -121,8 +121,8 @@ DEL-05, DEL-06, DEL-07 and DEL-12 are retired with the live deploy (see Out of S
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| DEL-01 | P1: Continuous integration | T5, T10 | In progress |
-| DEL-02 | P1: Continuous integration | T5, T10 | In progress |
+| DEL-01 | P1: Continuous integration | T5, T10 | Done |
+| DEL-02 | P1: Continuous integration | T5, T10 | Done |
 | DEL-03 | P1: Deploy readiness | T1 | Done |
 | DEL-04 | P1: Deploy readiness | T3 | Done |
 | DEL-05 | (live deploy) | - | Retired |
@@ -130,7 +130,7 @@ DEL-05, DEL-06, DEL-07 and DEL-12 are retired with the live deploy (see Out of S
 | DEL-07 | (live deploy) | - | Retired |
 | DEL-08 | P1: Reviewer-facing README | T7 | Done |
 | DEL-09 | P1: Reviewer-facing README | T7 | Done |
-| DEL-11 | P1: Continuous integration | T6, T10 | In progress |
+| DEL-11 | P1: Continuous integration | T6, T10 | Done |
 | DEL-12 | (live deploy) | T4 | Retired |
 | DEL-13 | Edge case | T2, T3, T4 | Done |
 
