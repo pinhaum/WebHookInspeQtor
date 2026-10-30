@@ -38,7 +38,7 @@ A portfolio project is judged by its public face: green CI, a deployable release
 | README language | English | User choice | y |
 | Failed `release_command` (formerly DEL-10) | Documented as Fly behavior in the README: a failing migration aborts the deploy and the previous release keeps serving; not tested | Testing it means deploying a broken migration to production on purpose | y |
 | Client IP in prod (DEL-06) | Already implemented by `WhiqWeb.ClientIP` and `config/runtime.exs`; delivery only verifies it live | Shipped with request-capture (commit `5f3f696`) | y |
-| Health check vs `force_ssl` | Fly's HTTP health check must not be redirected; the exact mechanism (excluded path or forwarded-proto header) is a Design choice | `force_ssl` in `config/prod.exs` redirects any request without `x-forwarded-proto: https` | n |
+| Health check vs `force_ssl` | Fly's HTTP health check must not be redirected; the exact mechanism (excluded path or forwarded-proto header) is a Design choice; resolved by excluding `/health` in `force_ssl` | `force_ssl` in `config/prod.exs` redirects any request without `x-forwarded-proto: https` | y |
 | DEL-07 failure | Switch client IP resolution to `x-forwarded-for` parsed from the right with `remote_ip`, as a fix task | Plan B agreed before deploy (see `request-capture` assumptions) | y |
 
 **Open questions:** none - all resolved or logged above.
