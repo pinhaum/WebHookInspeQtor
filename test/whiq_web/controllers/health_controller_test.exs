@@ -11,6 +11,18 @@ defmodule WhiqWeb.HealthControllerTest do
     assert get_resp_header(conn, "set-cookie") == []
   end
 
+  # fetch_session never writes an unused session, so "no set-cookie" alone
+  # cannot tell the bare scope from :browser; these outcomes can.
+  test "DEL-13: GET /health skips the browser pipeline", %{conn: conn} do
+    conn =
+      conn
+      |> put_req_header("accept", "application/json")
+      |> get(~p"/health")
+
+    assert conn.status == 200
+    assert get_resp_header(conn, "x-frame-options") == []
+  end
+
   test "DEL-13: GET /health does not query the database", %{conn: conn} do
     test_pid = self()
     handler_id = {__MODULE__, test_pid}

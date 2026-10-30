@@ -88,7 +88,7 @@ DEL-05, DEL-06, DEL-07 and DEL-12 are retired with the live deploy (see Out of S
 
 **Acceptance Criteria**:
 
-1. The README SHALL contain a live demo link, local setup with `docker compose`, an architecture overview and a "Decisions" section derived from `.specs/STATE.md` (DEL-08)
+1. The README SHALL state that the app is deploy-ready but not deployed, and contain local setup with `docker compose`, an architecture overview and a "Decisions" section derived from `.specs/STATE.md` (DEL-08)
 2. The README SHALL document the known fidelity limits: lowercased header names and plain-HTTP captures being redirected (DEL-09)
 
 **Independent Test**: A reader follows the setup section on a clean machine with only Docker.
@@ -143,4 +143,4 @@ DEL-10 is retired: it became the "Failed `release_command`" assumption. DEL-05, 
 ## Success Criteria
 
 - [ ] CI badge green on `main`.
-- [ ] Live URL captures and displays a request end to end.
+- [ ] ~~Live URL captures and displays a request end to end.~~ Retired with the live deploy (see Out of Scope).

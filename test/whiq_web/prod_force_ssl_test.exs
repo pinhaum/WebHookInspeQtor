@@ -32,6 +32,13 @@ defmodule WhiqWeb.ProdForceSSLTest do
     assert conn.status == nil
   end
 
+  test "plain-HTTP GET / on localhost passes through", %{ssl_opts: opts} do
+    conn = :get |> conn("http://localhost/") |> Plug.SSL.call(opts)
+
+    refute conn.halted
+    assert conn.status == nil
+  end
+
   test "DEL-04: plain-HTTP GET / is redirected to https", %{ssl_opts: opts} do
     conn = call(:get, "/", opts)
 
