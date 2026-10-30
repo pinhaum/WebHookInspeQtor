@@ -205,10 +205,10 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `actionlint` reports no errors
-- [ ] The same five commands pass locally in the compose `app` container with `MIX_ENV=test`
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] `actionlint` reports no errors
+- [x] The same five commands pass locally in the compose `app` container with `MIX_ENV=test`
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build
