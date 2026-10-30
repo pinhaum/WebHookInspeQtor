@@ -232,10 +232,10 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `actionlint` reports no errors
-- [ ] Job never pushes (`push: false`, no registry login step)
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] `actionlint` reports no errors
+- [x] Job never pushes (`push: false`, no registry login step)
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build

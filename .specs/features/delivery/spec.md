@@ -131,7 +131,7 @@ A portfolio project is judged by its public face: a live URL, green CI and a REA
 | DEL-07 | P1: Production deploy | - | Pending |
 | DEL-08 | P1: Reviewer-facing README | - | Pending |
 | DEL-09 | P1: Reviewer-facing README | - | Pending |
-| DEL-11 | P1: Continuous integration | - | Pending |
+| DEL-11 | P1: Continuous integration | T6, T10 | In progress |
 | DEL-12 | P1: Production deploy | T4, T8 | In progress |
 | DEL-13 | P1: Production deploy | T2, T3, T4, T8 | In progress |
 
