@@ -266,11 +266,11 @@ T8 → T9 → T10
 
 **Done when**:
 
-- [ ] Every section above present; each AD-001..AD-008 represented
-- [ ] Both fidelity limits stated explicitly
-- [ ] Setup commands match `compose.yaml` and `.env.example` exactly
-- [ ] Gate check passes: `docker compose run --rm -T app mix precommit`
-- [ ] Test count: baseline passes unchanged
+- [x] Every section above present; each AD-001..AD-008 represented
+- [x] Both fidelity limits stated explicitly
+- [x] Setup commands match `compose.yaml` and `.env.example` exactly
+- [x] Gate check passes: `docker compose run --rm -T app mix precommit`
+- [x] Test count: baseline passes unchanged
 
 **Tests**: none
 **Gate**: build
